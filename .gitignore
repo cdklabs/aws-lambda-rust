@@ -52,3 +52,4 @@ tsconfig.json
 !/.github/workflows/upgrade-cdklabs-projen-project-types.yml
 !/.github/workflows/upgrade.yml
 !/.github/workflows/upgrade-dev-deps.yml
+.idea/
