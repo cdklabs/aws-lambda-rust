@@ -1,21 +1,4 @@
 import { spawnSync, SpawnSyncOptions } from 'child_process';
-import { readFileSync } from 'fs';
-import { load } from 'js-toml';
-
-export interface Workspace {
-  members: string[];
-}
-
-export interface Package {
-  name: string;
-}
-
-export interface CargoManifest {
-  package?: Package;
-  bin?: Package[];
-  workspace?: Workspace;
-}
-
 
 /**
  * Spawn sync with error handling
@@ -37,18 +20,14 @@ export function exec(cmd: string, args: string[], options?: SpawnSyncOptions) {
   return proc;
 }
 
-/**
- * Read Cargo Manifest (Cargo.toml) file
- * @param path Path to Cargo.toml file
- */
-export function getCargoManifest(path: string): CargoManifest {
+export function canRunLocally(cmd: string) {
   try {
-    const data = readFileSync(path);
-    return load(data.toString('utf-8')) as CargoManifest;
+    const proc = spawnSync(cmd, ['--version']);
+    if (proc.status === 0 && !proc.error) {
+      return true;
+    }
+    return false;
   } catch (err) {
-    throw new Error(
-      `Unable to find or parse Cargo.toml at \`${path}\`\n` +
-        `${err}\n`,
-    );
+    return false;
   }
 }

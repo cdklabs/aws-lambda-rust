@@ -25,12 +25,12 @@ It will use the package name as defined in the main `Cargo.toml`:
 new RustFunction(this, "my_function");
 ```
 
-Alternatively, `bin` and `directory` properties can be specified to override this default behavior.
+Alternatively, `binaryName` and `manifestPath` properties can be specified to override this default behavior.
 
 ```typescript
 new RustFunction(this, "my_function", {
-    directory: '/path/to/directory/with/Cargo.toml',
-    bin: 'my_function',
+    manifestPath: '/path/to/directory/with/Cargo.toml',
+    binaryName: 'my_function',
 });
 ```
 
@@ -88,9 +88,11 @@ Any pure Rust Lambda function should compile correctly with this toolchain.
 By default, Construct will compile the code for Linux X86-64 architectures, but you can compile for ARM-64 architectures by providing the right property if needed:
 
 ```typescript
+import { Architecture } from 'aws-cdk-lib/aws-lambda';
+
 new RustFunction(this, 'my_function', {
     bundling: {
-        architecture: lambda.Architecture.ARM_64
+        architecture: Architecture.ARM_64
     }
 });
 ```
@@ -123,7 +125,7 @@ Use the `bundling.buildArgs` to pass build arguments to `cargo`:
 ```typescript
 new go.RustFunction(this, 'my_function', {
   bundling: {
-    buildArgs: ['--all-features'],
+    extraBuildArgs: ['--all-features'],
   },
 });
 ```
@@ -170,10 +172,7 @@ new RustFunction(this, 'my_function_with_commands', {
       },
       afterBundling(inputDir: string, outputDir: string): string[] {
         return [`cp ${inputDir}/b.txt ${outputDir}/txt`];
-      },
-      beforeInstall() {
-        return [];
-      },
+      }
       // ...
     },
     // ...
@@ -184,7 +183,6 @@ new RustFunction(this, 'my_function_with_commands', {
 The following hooks are available:
 
 - **beforeBundling**: runs before all bundling commands
-- **beforeInstall**: runs before Cargo crates installation
 - **afterBundling**: runs after all bundling commands
 
 They all receive the directory containing the lock file (inputDir) and the directory where the bundled asset will be output (outputDir).

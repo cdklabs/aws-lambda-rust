@@ -2,11 +2,11 @@ ARG RUST_VERSION=1.73.0
 
 FROM rust:$RUST_VERSION
 
-# Install Rust through Rustup
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
 # Install Zig
 RUN cargo install cargo-zigbuild
+
+# Install Cross
+RUN cargo install cross --git https://github.com/cross-rs/cross
 
 # Install Rust targets
 RUN rustup target add \
@@ -16,4 +16,4 @@ RUN rustup target add \
 # create non root user and change allow execute command for non root user
 RUN /sbin/useradd -u 1000 user && chmod 711 /
 
-CMD [ "cargo zigbuild" ]
+CMD [ "cargo-zigbuild", "--version" ]

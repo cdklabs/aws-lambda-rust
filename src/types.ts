@@ -1,5 +1,4 @@
 import { AssetHashType, BundlingFileAccess, DockerImage, DockerRunOptions } from 'aws-cdk-lib/core';
-import { Architecture } from 'aws-cdk-lib/aws-lambda';
 
 /**
  * Bundling options
@@ -7,17 +6,22 @@ import { Architecture } from 'aws-cdk-lib/aws-lambda';
 export interface BundlingOptions extends DockerRunOptions {
 
   /**
-   * The system architecture of the lambda function
-   *
-   * @default - Architecture.X86_64
+   * Cross compilation target environment for the generated binary.
    */
-  readonly architecture?: Architecture;
+  readonly target?: string;
+
   /**
-   * Environment variables defined when Cargo runs.
-   *
-   * @default - no environment variables are defined.
+   * Build artifacts with the specified profile
    */
-  readonly environment?: { [key: string]: string };
+  readonly profile?: string;
+
+  /**
+   * Build optimized artifacts with the release profile
+   *
+   * @default - true
+   */
+  readonly release?: boolean;
+
   /**
    * Force bundling in a Docker container even if local bundling is
    * possible.
@@ -34,11 +38,14 @@ export interface BundlingOptions extends DockerRunOptions {
   readonly dockerImage?: DockerImage;
 
   /**
-   * Build arguments to pass when building the bundling image.
+   * Additional arguments that are passed in at build time to package manager.
    *
-   * @default - no build arguments are passed
+   * ## Examples
+   *
+   * - `--all-features`
+   * - `--no-default-features`
    */
-  readonly buildArgs?: { [key:string] : string };
+  readonly extraBuildArgs?: string[];
 
   /**
    * Determines how the asset hash is calculated. Assets will
@@ -138,14 +145,10 @@ export interface ICommandHooks {
 export enum LogLevel {
   /** Show everything */
   VERBOSE = 'verbose',
-  /** Show everything from info and some additional messages for debugging */
-  DEBUG = 'debug',
   /** Show warnings, errors, and an output file summary */
   INFO = 'info',
-  /** Show warnings and errors */
-  WARNING = 'warning',
-  /** Show errors only */
-  ERROR = 'error',
   /** Show nothing */
   SILENT = 'silent',
 }
+
+

@@ -1,3 +1,4 @@
+import * as os from 'os';
 import * as path from 'path';
 import { Architecture, AssetCode, Code, Runtime } from 'aws-cdk-lib/aws-lambda';
 import {
@@ -9,30 +10,25 @@ import {
   DockerVolume,
   ILocalBundling,
 } from 'aws-cdk-lib/core';
-import { IConstruct } from 'constructs';
-import { CrateInstallation } from './crate-installation';
-import { BundlingOptions } from './types';
-import { CargoManifest, getCargoManifest } from './util';
-import * as os from 'os';
+import { PackageManager, PackageManagerType } from './package-manager';
+import { BundlingOptions, LogLevel } from './types';
+import { exec } from './util';
 
 /**
  * Bundling properties
  */
 export interface BundlingProps extends BundlingOptions {
-  /**
-   * Path to project root
-   *
-   * This will be used as the source of the volume mounted in the Docker
-   * container and will be the directory where it will run `cargo lambda build` from.
-   */
-  readonly projectRoot: string;
 
   /**
-   * The name of the binary to build
-   *
-   * @default Package's name
+   * Path to the Cargo.toml file.
+   * By default, Cargo searches for the Cargo.toml file in the current directory or any parent directory.
    */
-  readonly binaryName?: string;
+  readonly manifestPath: string;
+
+  /**
+   * Path to project root
+   */
+  readonly projectRoot: string;
 
   /**
      * The runtime of the lambda function
@@ -45,43 +41,52 @@ export interface BundlingProps extends BundlingOptions {
      * @default - Architecture.X86_64
      */
   readonly architecture: Architecture;
-}
 
-interface CommandOptions {
-  readonly inputDir: string;
-  readonly outputDir: string;
+  /**
+   * Build only the specified binary
+   *
+   * @default Build all binaries
+   */
   readonly binaryName?: string;
-  readonly osPlatform: NodeJS.Platform;
-  readonly architecture?: Architecture;
-  readonly lambdaExtension?: boolean;
-  readonly manifest: CargoManifest;
+
+  /**
+   * Package to build
+   *
+   * @default Build all packages in the workspace
+   */
+  readonly packageName?: string;
+
+  /**
+   * The type of package manager to use
+   *
+   * @default - PackageManagerType.CARGO_ZIGBUILD
+   */
+  readonly packageManagerType?: PackageManagerType;
+
+  /**
+   * Which option to use to copy the source files to the docker container and output files back
+   * @default - BundlingFileAccess.BIND_MOUNT
+   */
+  readonly bundlingFileAccess?: BundlingFileAccess;
 }
 
 /**
  * Bundling with esbuild
  */
 export class Bundling implements CdkBundlingOptions {
+
+  public static X86_64__TARGET: string = 'x86_64-unknown-linux-gnu';
+  public static ARM_TARGET: string = 'aarch64-unknown-linux-gnu';
   /**
    * Cargo bundled Lambda asset code
    */
-  public static bundle(scope: IConstruct, options: BundlingProps): AssetCode {
+  public static bundle(options: BundlingProps): AssetCode {
     return Code.fromAsset(options.projectRoot, {
       assetHash: options.assetHash,
       assetHashType: options.assetHash ? AssetHashType.CUSTOM : AssetHashType.OUTPUT,
-      bundling: new Bundling(scope, options),
+      bundling: new Bundling(options),
     });
   }
-
-  public static clearCargoInstallationCache(): void {
-    this.cargoInstallation = undefined;
-  }
-
-  public static clearZigInstallationCache(): void {
-    this.zigInstallation = undefined;
-  }
-
-  private static cargoInstallation?: CrateInstallation;
-  private static zigInstallation?: CrateInstallation;
 
   public readonly image: DockerImage;
   public readonly entrypoint?: string[];
@@ -96,17 +101,25 @@ export class Bundling implements CdkBundlingOptions {
   public readonly local?: ILocalBundling;
   public readonly bundlingFileAccess?: BundlingFileAccess;
 
+  private readonly projectRoot: string;
+  private readonly relativeManifestPath: string;
+  private readonly packageManager: PackageManager;
+
   constructor(private readonly props: BundlingProps) {
+    const packageManagerType = props.packageManagerType ?? PackageManagerType.CARGO_ZIGBUILD;
+    this.projectRoot = props.projectRoot;
+    this.relativeManifestPath = path.relative(this.projectRoot, path.resolve(props.manifestPath));
+    this.packageManager = PackageManager.fromType(packageManagerType);
 
-    Bundling.cargoInstallation = Bundling.cargoInstallation ?? CrateInstallation.detect('cargo');
-    Bundling.zigInstallation = Bundling.zigInstallation ?? CrateInstallation.detect('cargo-zigbuild');
-
+    const buildArgs = ['--color', 'always'];
+    if (props.extraBuildArgs) {
+      buildArgs.push(...props.extraBuildArgs);
+    }
     // Docker bundling
-    const shouldBuildImage = props.forceDockerBundling || !Bundling.zigInstallation;
-    this.image = shouldBuildImage ? props.dockerImage ?? DockerImage.fromBuild(path.join(__dirname, '../lib'),
+    const shouldBuildImage = props.forceDockerBundling || !this.packageManager.runLocally;
+    this.image = shouldBuildImage ? props.dockerImage ?? DockerImage.fromBuild(path.join(__dirname, '../src'),
       {
         buildArgs: {
-          ...props.buildArgs ?? {},
           // If runtime isn't passed use regional default, lowest common denominator is node18
           IMAGE: props.runtime.bundlingImage.image,
         },
@@ -115,11 +128,10 @@ export class Bundling implements CdkBundlingOptions {
       : DockerImage.fromRegistry('dummy'); // Do not build if we don't need to
 
     const bundlingCommand = this.createBundlingCommand({
-      manifest: getCargoManifest(props.projectRoot),
-      binaryName: props.binaryName,
-      architecture: props.architecture,
       inputDir: AssetStaging.BUNDLING_INPUT_DIR,
       outputDir: AssetStaging.BUNDLING_OUTPUT_DIR,
+      buildArgs: buildArgs,
+      buildRunner: this.packageManager.runBuildCommand(),
       osPlatform: 'linux', // linux docker image
     });
     this.command = props.command ?? ['bash', '-c', bundlingCommand];
@@ -141,115 +153,113 @@ export class Bundling implements CdkBundlingOptions {
     }
   }
 
-  public createBundlingCommand(props: CommandOptions): string {
-    const buildBinary: string[] = [
-      'cargo',
-      'lambda',
-      'build',
-      '--release',
-      '--lambda-dir',
-      props.outputDir,
+  public createBundlingCommand(options: BundlingCommandOptions): string {
+    const pathJoin = osPathJoin(options.osPlatform);
+    const release = this.props.release ?? true;
+    let relativeManifestPath = pathJoin(options.inputDir, this.relativeManifestPath);
+
+
+    const buildCommand: string[] = [
+      options.buildRunner,
+      ...this.props.manifestPath ? [`--manifest-path=${relativeManifestPath}`] : [],
+      ...this.props.packageName ? [`--package=${this.props.packageName}`] : [],
+      ...this.props.binaryName ? [`--bin=${this.props.binaryName}`] : [],
+      ...this.props.profile ? [`--profile=${this.props.profile}`] : [],
+      ...this.props.logLevel && this.props.logLevel == LogLevel.SILENT ? ['--quiet'] : [],
+      ...release ? ['--release'] : [],
+      `--target-dir ${options.outputDir}`,
+      ...options.buildArgs,
     ];
 
-    if (props.lambdaExtension) {
-      buildBinary.push('--extension');
+    if (this.packageManager.crossCompile) {
+      buildCommand.push(`--target ${this.props.target && isValidTarget(this.props.target) ? this.props.target : toTarget(this.props.architecture)}`);
     }
-
-    if (props.architecture) {
-      const targetFlag = props.architecture.name == Architecture.ARM_64.name ? '--arm64' : '--x86-64';
-      buildBinary.push(targetFlag);
-    }
-
-    let packageName;
-    if (props.binaryName) {
-      buildBinary.push('--bin');
-      buildBinary.push(props.binaryName);
-      packageName = props.binaryName;
-    } else {
-      if (props.manifest.workspace) {
-        throw new Error('the Cargo manifest is a workspace, use the option `binaryName` to specify the binary to build');
-      }
-
-      packageName = props.manifest.package?.name;
-      if (props.manifest.bin) {
-        if (props.manifest.bin.length == 1) {
-          packageName = props.manifest.bin[0].name;
-
-          buildBinary.push('--bin');
-          buildBinary.push(packageName);
-        } else {
-          throw new Error('there are more than one binaries declared in this Cargo package, use the option `binaryName` to specify the binary to build');
-        }
-      }
-
-      if (!packageName) {
-        throw new Error('the Cargo package is missing the package name or a [[bin]] section, use the option `binaryName` to specify the binary to build');
-      }
-    }
-
-    if (!props.lambdaExtension && packageName) {
-      buildBinary.push('--flatten');
-      buildBinary.push(packageName);
-    }
-
-    const command = buildBinary.join(' ');
 
     return chain([
-      ...this.props.commandHooks?.beforeBundling(props.inputDir, props.outputDir) ?? [],
-      command,
-      ...this.props.commandHooks?.afterBundling(props.inputDir, props.outputDir) ?? [],
+      ...this.props.commandHooks?.beforeBundling(options.inputDir, options.outputDir) ?? [],
+      buildCommand.join(' '),
+      ...this.props.commandHooks?.afterBundling(options.inputDir, options.outputDir) ?? [],
     ]);
   }
 
   private getLocalBundlingProvider(): ILocalBundling {
     const osPlatform = os.platform();
-    const createLocalCommand = (outputDir: string, esbuild: PackageInstallation, tsc?: PackageInstallation) => this.createBundlingCommand({
+    const createLocalCommand = (outputDir: string, buildArgs: string[]) => this.createBundlingCommand({
       inputDir: this.projectRoot,
       outputDir,
-      esbuildRunner: esbuild.isLocal ? this.packageManager.runBinCommand('esbuild') : 'esbuild',
-      tscRunner: tsc && (tsc.isLocal ? this.packageManager.runBinCommand('tsc') : 'tsc'),
+      buildRunner: this.packageManager.runBuildCommand(),
       osPlatform,
+      buildArgs,
     });
     const environment = this.props.environment ?? {};
     const cwd = this.projectRoot;
 
     return {
       tryBundle(outputDir: string) {
-        if (!Bundling.esbuildInstallation) {
-          process.stderr.write('esbuild cannot run locally. Switching to Docker bundling.\n');
+        if (!this) {
+          process.stderr.write('Selected package manager cannot run locally. Switching to Docker bundling.\n');
           return false;
         }
 
-        if (!Bundling.esbuildInstallation.version.startsWith(`${ESBUILD_MAJOR_VERSION}.`)) {
-          throw new Error(`Expected esbuild version ${ESBUILD_MAJOR_VERSION}.x but got ${Bundling.esbuildInstallation.version}`);
-        }
-
-        const localCommand = createLocalCommand(outputDir, Bundling.esbuildInstallation, Bundling.tscInstallation);
+        const buildArgs = ['--color', 'always'];
+        const localCommand = createLocalCommand(outputDir, buildArgs);
 
         exec(
-            osPlatform === 'win32' ? 'cmd' : 'bash',
-            [
-              osPlatform === 'win32' ? '/c' : '-c',
-              localCommand,
+          osPlatform === 'win32' ? 'cmd' : 'bash',
+          [
+            osPlatform === 'win32' ? '/c' : '-c',
+            localCommand,
+          ],
+          {
+            env: { ...process.env, ...environment },
+            stdio: [ // show output
+              'ignore', // ignore stdio
+              process.stderr, // redirect stdout to stderr
+              'inherit', // inherit stderr
             ],
-            {
-              env: { ...process.env, ...environment },
-              stdio: [ // show output
-                'ignore', // ignore stdio
-                process.stderr, // redirect stdout to stderr
-                'inherit', // inherit stderr
-              ],
-              cwd,
-              windowsVerbatimArguments: osPlatform === 'win32',
-            });
+            cwd,
+            windowsVerbatimArguments: osPlatform === 'win32',
+          });
 
         return true;
       },
     };
   }
 }
+
+/**
+ * Command options for bundling a Lambda asset
+ */
+interface BundlingCommandOptions {
+  readonly inputDir: string;
+  readonly outputDir: string;
+  readonly buildRunner: string;
+  readonly buildArgs: string[];
+  readonly osPlatform: NodeJS.Platform;
+}
+
 function chain(commands: string[]): string {
   return commands.filter(c => !!c).join(' && ');
+}
+
+/**
+ * Validates a target against a list of allowed targets.
+ * @param target the target to validate.
+ */
+function isValidTarget(target: string): boolean {
+  return target.startsWith(Bundling.X86_64__TARGET) || target.startsWith(Bundling.ARM_TARGET);
+}
+
+/**
+ * Converts an Architecture to a bundling target
+ */
+function toTarget(architecture: Architecture): string {
+  switch (architecture) {
+    case Architecture.ARM_64:
+      return Bundling.ARM_TARGET;
+    default:
+      return Bundling.X86_64__TARGET;
+  }
 }
 
 /**
