@@ -12,34 +12,27 @@ import {
 } from 'aws-cdk-lib/core';
 import { PackageManager, PackageManagerType } from './package-manager';
 import { BundlingOptions, LogLevel } from './types';
-import { exec } from './util';
+import { checkInstalledTarget, exec } from './util';
 
 /**
  * Bundling properties
  */
 export interface BundlingProps extends BundlingOptions {
-
   /**
-   * Path to the Cargo.toml file.
-   * By default, Cargo searches for the Cargo.toml file in the current directory or any parent directory.
+   * Path to folder containing the Cargo.toml file.
    */
-  readonly manifestPath: string;
+  readonly entry: string;
 
   /**
-   * Path to project root
+   * The runtime of the lambda function
    */
-  readonly projectRoot: string;
-
-  /**
-     * The runtime of the lambda function
-     */
   readonly runtime: Runtime;
 
   /**
-     * The system architecture of the lambda function
-     *
-     * @default - Architecture.X86_64
-     */
+   * The system architecture of the lambda function
+   *
+   * @default - Architecture.X86_64
+   */
   readonly architecture: Architecture;
 
   /**
@@ -55,6 +48,11 @@ export interface BundlingProps extends BundlingOptions {
    * @default Build all packages in the workspace
    */
   readonly packageName?: string;
+
+  /**
+   * Path to project root
+   */
+  readonly projectRoot: string;
 
   /**
    * The type of package manager to use
@@ -74,16 +72,18 @@ export interface BundlingProps extends BundlingOptions {
  * Bundling with esbuild
  */
 export class Bundling implements CdkBundlingOptions {
-
   public static X86_64__TARGET: string = 'x86_64-unknown-linux-gnu';
   public static ARM_TARGET: string = 'aarch64-unknown-linux-gnu';
+
   /**
    * Cargo bundled Lambda asset code
    */
   public static bundle(options: BundlingProps): AssetCode {
-    return Code.fromAsset(options.projectRoot, {
+    return Code.fromAsset(path.dirname(options.entry), {
       assetHash: options.assetHash,
-      assetHashType: options.assetHash ? AssetHashType.CUSTOM : AssetHashType.OUTPUT,
+      assetHashType: options.assetHash
+        ? AssetHashType.CUSTOM
+        : AssetHashType.OUTPUT,
       bundling: new Bundling(options),
     });
   }
@@ -102,29 +102,39 @@ export class Bundling implements CdkBundlingOptions {
   public readonly bundlingFileAccess?: BundlingFileAccess;
 
   private readonly projectRoot: string;
-  private readonly relativeManifestPath: string;
   private readonly packageManager: PackageManager;
+  private readonly relativeEntryPath: string;
 
   constructor(private readonly props: BundlingProps) {
-    const packageManagerType = props.packageManagerType ?? PackageManagerType.CARGO_ZIGBUILD;
+    const packageManagerType =
+      props.packageManagerType ?? PackageManagerType.CARGO_ZIGBUILD;
+
     this.projectRoot = props.projectRoot;
-    this.relativeManifestPath = path.relative(this.projectRoot, path.resolve(props.manifestPath));
     this.packageManager = PackageManager.fromType(packageManagerType);
+    this.relativeEntryPath = path.relative(
+      this.projectRoot,
+      path.resolve(props.entry),
+    );
 
     const buildArgs = ['--color', 'always'];
     if (props.extraBuildArgs) {
       buildArgs.push(...props.extraBuildArgs);
     }
     // Docker bundling
-    const shouldBuildImage = props.forceDockerBundling || !this.packageManager.runLocally;
-    this.image = shouldBuildImage ? props.dockerImage ?? DockerImage.fromBuild(path.join(__dirname, '../src'),
-      {
-        buildArgs: {
-          // If runtime isn't passed use regional default, lowest common denominator is node18
-          IMAGE: props.runtime.bundlingImage.image,
-        },
-        platform: props.architecture.dockerPlatform,
-      })
+    const shouldBuildImage =
+      props.forceDockerBundling ||
+      !this.packageManager.runLocally ||
+      !checkInstalledTarget(toTarget(this.props.architecture));
+    this.image = shouldBuildImage
+      ? props.dockerImage ??
+        DockerImage.fromBuild(path.join(__dirname, '../src'), {
+          buildArgs: {
+            ...(props.buildArgs ?? {}),
+            // If runtime isn't passed use regional default, lowest common denominator is node18
+            IMAGE: props.runtime.bundlingImage.image,
+          },
+          platform: props.architecture.dockerPlatform,
+        })
       : DockerImage.fromRegistry('dummy'); // Do not build if we don't need to
 
     const bundlingCommand = this.createBundlingCommand({
@@ -148,7 +158,8 @@ export class Bundling implements CdkBundlingOptions {
     this.bundlingFileAccess = props.bundlingFileAccess;
 
     // Local bundling
-    if (!props.forceDockerBundling) { // only if Docker is not forced
+    if (!props.forceDockerBundling) {
+      // only if Docker is not forced
       this.local = this.getLocalBundlingProvider();
     }
   }
@@ -156,48 +167,84 @@ export class Bundling implements CdkBundlingOptions {
   public createBundlingCommand(options: BundlingCommandOptions): string {
     const pathJoin = osPathJoin(options.osPlatform);
     const release = this.props.release ?? true;
-    let relativeManifestPath = pathJoin(options.inputDir, this.relativeManifestPath);
-
+    let relativeManifestPath = pathJoin(
+      options.inputDir,
+      this.relativeEntryPath,
+    );
 
     const buildCommand: string[] = [
       options.buildRunner,
-      ...this.props.manifestPath ? [`--manifest-path=${relativeManifestPath}`] : [],
-      ...this.props.packageName ? [`--package=${this.props.packageName}`] : [],
-      ...this.props.binaryName ? [`--bin=${this.props.binaryName}`] : [],
-      ...this.props.profile ? [`--profile=${this.props.profile}`] : [],
-      ...this.props.logLevel && this.props.logLevel == LogLevel.SILENT ? ['--quiet'] : [],
-      ...release ? ['--release'] : [],
+      `--manifest-path=${relativeManifestPath}`,
+      ...(this.props.packageName
+        ? [`--package=${this.props.packageName}`]
+        : []),
+      ...(this.props.binaryName ? [`--bin=${this.props.binaryName}`] : []),
+      ...(this.props.profile ? [`--profile=${this.props.profile}`] : []),
+      ...(release ? ['--release'] : []),
       `--target-dir ${options.outputDir}`,
       ...options.buildArgs,
     ];
 
+    // Target
     if (this.packageManager.crossCompile) {
-      buildCommand.push(`--target ${this.props.target && isValidTarget(this.props.target) ? this.props.target : toTarget(this.props.architecture)}`);
+      buildCommand.push(
+        `--target ${
+          this.props.target && isValidTarget(this.props.target)
+            ? this.props.target
+            : toTarget(this.props.architecture)
+        }`,
+      );
+    }
+
+    // Features
+    if (this.props.features) {
+      buildCommand.push('--features', this.props.features.join(','));
+    }
+
+    // Log level
+    if (this.props.logLevel && this.props.logLevel == LogLevel.SILENT) {
+      buildCommand.push('--silent');
+    } else if (this.props.logLevel && this.props.logLevel == LogLevel.VERBOSE) {
+      buildCommand.push('--verbose');
     }
 
     return chain([
-      ...this.props.commandHooks?.beforeBundling(options.inputDir, options.outputDir) ?? [],
+      ...(this.props.commandHooks?.beforeBundling(
+        options.inputDir,
+        options.outputDir,
+      ) ?? []),
       buildCommand.join(' '),
-      ...this.props.commandHooks?.afterBundling(options.inputDir, options.outputDir) ?? [],
+      ...(this.props.commandHooks?.afterBundling(
+        options.inputDir,
+        options.outputDir,
+      ) ?? []),
     ]);
   }
 
   private getLocalBundlingProvider(): ILocalBundling {
     const osPlatform = os.platform();
-    const createLocalCommand = (outputDir: string, buildArgs: string[]) => this.createBundlingCommand({
-      inputDir: this.projectRoot,
-      outputDir,
-      buildRunner: this.packageManager.runBuildCommand(),
-      osPlatform,
-      buildArgs,
-    });
+    const projectRoot = path.dirname(this.props.entry);
+    const createLocalCommand = (outputDir: string, buildArgs: string[]) =>
+      this.createBundlingCommand({
+        inputDir: projectRoot,
+        outputDir,
+        buildRunner: this.packageManager.runBuildCommand(),
+        osPlatform,
+        buildArgs,
+      });
     const environment = this.props.environment ?? {};
-    const cwd = this.projectRoot;
+    const cwd = projectRoot;
 
     return {
       tryBundle(outputDir: string) {
-        if (!this) {
-          process.stderr.write('Selected package manager cannot run locally. Switching to Docker bundling.\n');
+        if (
+          !PackageManager.fromType(PackageManagerType.CARGO_ZIGBUILD)
+            .runLocally &&
+          !PackageManager.fromType(PackageManagerType.CROSS).runLocally
+        ) {
+          process.stderr.write(
+            'No package manager cannot run locally. Switching to Docker bundling.\n',
+          );
           return false;
         }
 
@@ -206,20 +253,19 @@ export class Bundling implements CdkBundlingOptions {
 
         exec(
           osPlatform === 'win32' ? 'cmd' : 'bash',
-          [
-            osPlatform === 'win32' ? '/c' : '-c',
-            localCommand,
-          ],
+          [osPlatform === 'win32' ? '/c' : '-c', localCommand],
           {
             env: { ...process.env, ...environment },
-            stdio: [ // show output
+            stdio: [
+              // show output
               'ignore', // ignore stdio
               process.stderr, // redirect stdout to stderr
               'inherit', // inherit stderr
             ],
             cwd,
             windowsVerbatimArguments: osPlatform === 'win32',
-          });
+          },
+        );
 
         return true;
       },
@@ -239,7 +285,7 @@ interface BundlingCommandOptions {
 }
 
 function chain(commands: string[]): string {
-  return commands.filter(c => !!c).join(' && ');
+  return commands.filter((c) => !!c).join(' && ');
 }
 
 /**
@@ -247,7 +293,10 @@ function chain(commands: string[]): string {
  * @param target the target to validate.
  */
 function isValidTarget(target: string): boolean {
-  return target.startsWith(Bundling.X86_64__TARGET) || target.startsWith(Bundling.ARM_TARGET);
+  return (
+    target.startsWith(Bundling.X86_64__TARGET) ||
+    target.startsWith(Bundling.ARM_TARGET)
+  );
 }
 
 /**
@@ -266,7 +315,7 @@ function toTarget(architecture: Architecture): string {
  * Platform specific path join
  */
 function osPathJoin(platform: NodeJS.Platform) {
-  return function(...paths: string[]): string {
+  return function (...paths: string[]): string {
     const joined = path.join(...paths);
     // If we are on win32 but need posix style paths
     if (os.platform() === 'win32' && platform !== 'win32') {

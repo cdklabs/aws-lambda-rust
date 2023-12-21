@@ -6,7 +6,7 @@ interface PackageManagerProps {
   readonly buildCommand: string[];
   readonly crossCompile: boolean;
   readonly runLocally: boolean;
-  readonly argsSeparator?: string;
+  readonly type: PackageManagerType;
 }
 
 export enum PackageManagerType {
@@ -18,7 +18,6 @@ export enum PackageManagerType {
  * A Rust package manager
  */
 export class PackageManager {
-
   /**
    * Create a package manager from a package manager type. Method will also check if it can be runned locally
    * @param type Package manager used
@@ -38,6 +37,7 @@ export class PackageManager {
       buildCommand: buildCommand,
       runLocally: canRunLocally(runCommand),
       crossCompile: crossCompile,
+      type,
     });
   }
 
@@ -45,12 +45,14 @@ export class PackageManager {
   public readonly buildCommand: string[];
   public readonly runLocally: boolean;
   public readonly crossCompile: boolean;
+  public readonly type: PackageManagerType;
 
   constructor(props: PackageManagerProps) {
     this.runCommand = props.runCommand;
     this.buildCommand = props.buildCommand;
     this.crossCompile = props.crossCompile;
     this.runLocally = props.runLocally;
+    this.type = props.type;
   }
 
   public runBuildCommand(): string {

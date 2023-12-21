@@ -1,6 +1,8 @@
 import * as child_process from 'child_process';
 import { PackageManager, PackageManagerType } from '../lib/package-manager';
 
+jest.mock('child_process');
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -17,9 +19,10 @@ test('Cargo-Zigbuild package manager', () => {
 
   expect(PackageManager.fromType(PackageManagerType.CARGO_ZIGBUILD)).toEqual({
     runCommand: 'cargo-zigbuild',
-    buildCommand: 'zigbuild',
+    buildCommand: ['zigbuild'],
     runLocally: true,
     crossCompile: true,
+    type: PackageManagerType.CARGO_ZIGBUILD,
   });
 
   spawnSyncMock.mockRestore();
@@ -36,6 +39,7 @@ test('Cargo-Zigbuild package manager build command', () => {
   });
 
   const manager = PackageManager.fromType(PackageManagerType.CARGO_ZIGBUILD);
+
   expect(manager.runBuildCommand()).toEqual('cargo-zigbuild zigbuild');
 
   spawnSyncMock.mockRestore();
@@ -53,9 +57,10 @@ test('Cross package manager', () => {
 
   expect(PackageManager.fromType(PackageManagerType.CROSS)).toEqual({
     runCommand: 'cross',
-    buildCommand: 'build',
+    buildCommand: ['build'],
     runLocally: true,
     crossCompile: true,
+    type: PackageManagerType.CROSS,
   });
 
   spawnSyncMock.mockRestore();

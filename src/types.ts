@@ -1,10 +1,14 @@
-import { AssetHashType, BundlingFileAccess, DockerImage, DockerRunOptions } from 'aws-cdk-lib/core';
+import {
+  AssetHashType,
+  BundlingFileAccess,
+  DockerImage,
+  DockerRunOptions,
+} from 'aws-cdk-lib/core';
 
 /**
  * Bundling options
  */
 export interface BundlingOptions extends DockerRunOptions {
-
   /**
    * Cross compilation target environment for the generated binary.
    */
@@ -21,6 +25,11 @@ export interface BundlingOptions extends DockerRunOptions {
    * @default - true
    */
   readonly release?: boolean;
+
+  /**
+   * A list of features to activate when compiling Rust code.
+   */
+  readonly features?: string[];
 
   /**
    * Force bundling in a Docker container even if local bundling is
@@ -46,6 +55,13 @@ export interface BundlingOptions extends DockerRunOptions {
    * - `--no-default-features`
    */
   readonly extraBuildArgs?: string[];
+
+  /**
+   * Build arguments to pass when building the bundling image.
+   *
+   * @default - no build arguments are passed
+   */
+  readonly buildArgs?: { [key: string]: string };
 
   /**
    * Determines how the asset hash is calculated. Assets will
@@ -125,17 +141,17 @@ export interface BundlingOptions extends DockerRunOptions {
  */
 export interface ICommandHooks {
   /**
-     * Returns commands to run before bundling.
-     *
-     * Commands are chained with `&&`.
-     */
+   * Returns commands to run before bundling.
+   *
+   * Commands are chained with `&&`.
+   */
   beforeBundling(inputDir: string, outputDir: string): string[];
 
   /**
-     * Returns commands to run after bundling.
-     *
-     * Commands are chained with `&&`.
-     */
+   * Returns commands to run after bundling.
+   *
+   * Commands are chained with `&&`.
+   */
   afterBundling(inputDir: string, outputDir: string): string[];
 }
 
@@ -150,5 +166,3 @@ export enum LogLevel {
   /** Show nothing */
   SILENT = 'silent',
 }
-
-

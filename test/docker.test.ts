@@ -4,7 +4,11 @@ import * as path from 'path';
 const docker = process.env.CDK_DOCKER ?? 'docker';
 
 beforeAll(() => {
-  const process = spawnSync(docker, ['build', '-t', 'cargo-builder', path.join(__dirname, '../src')], { stdio: 'inherit' });
+  const process = spawnSync(
+    docker,
+    ['build', '-t', 'cargo-builder', path.join(__dirname, '../src')],
+    { stdio: 'inherit' },
+  );
   expect(process.error).toBeUndefined();
   expect(process.status).toBe(0);
 });
@@ -41,9 +45,13 @@ test('cross is available', () => {
 
 test('can package manager install with non root user', () => {
   const proc = spawnSync(docker, [
-    'run', '-u', '1000:1000',
+    'run',
+    '-u',
+    '1000:1000',
     'cargo-builder',
-    'bash', '-c', [
+    'bash',
+    '-c',
+    [
       'mkdir /tmp/test',
       'cd /tmp/test',
       'cargo new sample',
@@ -56,8 +64,11 @@ test('can package manager install with non root user', () => {
 
 test('cache folders have the right permissions', () => {
   const proc = spawnSync(docker, [
-    'run', 'cargo-builder',
-    'bash', '-c', 'stat -c \'%a\' /usr/local/cargo/bin',
+    'run',
+    'cargo-builder',
+    'bash',
+    '-c',
+    "stat -c '%a' /usr/local/cargo/bin",
   ]);
   expect(proc.stdout.toString()).toMatch('777');
 });
