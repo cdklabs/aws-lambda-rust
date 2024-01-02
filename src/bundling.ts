@@ -104,6 +104,7 @@ export class Bundling implements CdkBundlingOptions {
   private readonly projectRoot: string;
   private readonly packageManager: PackageManager;
   private readonly relativeEntryPath: string;
+  private readonly target: string;
 
   constructor(private readonly props: BundlingProps) {
     const packageManagerType =
@@ -111,12 +112,15 @@ export class Bundling implements CdkBundlingOptions {
 
     this.projectRoot = props.projectRoot;
     this.packageManager = PackageManager.fromType(packageManagerType);
+    this.target = this.props.target && isValidTarget(this.props.target)
+      ? this.props.target
+      : toTarget(this.props.architecture);
     this.relativeEntryPath = path.relative(
       this.projectRoot,
       path.resolve(props.entry),
     );
 
-    const buildArgs = ['--color', 'always'];
+    const buildArgs = ['--release', '--color', 'always'];
     if (props.extraBuildArgs) {
       buildArgs.push(...props.extraBuildArgs);
     }
@@ -166,7 +170,12 @@ export class Bundling implements CdkBundlingOptions {
 
   public createBundlingCommand(options: BundlingCommandOptions): string {
     const pathJoin = osPathJoin(options.osPlatform);
-    const release = this.props.release ?? true;
+    const osPlatform = os.platform();
+    const sourceBootstrap = pathJoin(options.inputDir, 'target', this.target, 'release');
+    const targetBootstrap= pathJoin(options.outputDir, 'bootstrap');
+
+    let packageName = '';
+
     let relativeManifestPath = pathJoin(
       options.inputDir,
       this.relativeEntryPath,
@@ -180,19 +189,18 @@ export class Bundling implements CdkBundlingOptions {
         : []),
       ...(this.props.binaryName ? [`--bin=${this.props.binaryName}`] : []),
       ...(this.props.profile ? [`--profile=${this.props.profile}`] : []),
-      ...(release ? ['--release'] : []),
-      `--target-dir ${options.outputDir}`,
       ...options.buildArgs,
     ];
+
+    if (this.props.binaryName) {
+      buildCommand.push('--bin', this.props.binaryName);
+      packageName = this.props.binaryName;
+    }
 
     // Target
     if (this.packageManager.crossCompile) {
       buildCommand.push(
-        `--target ${
-          this.props.target && isValidTarget(this.props.target)
-            ? this.props.target
-            : toTarget(this.props.architecture)
-        }`,
+        `--target ${this.target}`,
       );
     }
 
@@ -208,12 +216,22 @@ export class Bundling implements CdkBundlingOptions {
       buildCommand.push('--verbose');
     }
 
+    // Move target file to destination
+    const moveCommand: string =
+        osPlatform === 'win32'
+          ? ['powershell', '-command', 'Move-Item', '-Path', sourceBootstrap, '-Destination', targetBootstrap]
+            .filter((c) => !!c)
+            .join(' ')
+          : ['mv', sourceBootstrap, targetBootstrap].filter((c) => !!c).join(' ');
+
+
     return chain([
       ...(this.props.commandHooks?.beforeBundling(
         options.inputDir,
         options.outputDir,
       ) ?? []),
-      buildCommand.join(' '),
+      buildCommand.filter((c) => !!c).join(' '),
+      moveCommand,
       ...(this.props.commandHooks?.afterBundling(
         options.inputDir,
         options.outputDir,
@@ -248,7 +266,7 @@ export class Bundling implements CdkBundlingOptions {
           return false;
         }
 
-        const buildArgs = ['--color', 'always'];
+        const buildArgs = ['--release', '--color', 'always'];
         const localCommand = createLocalCommand(outputDir, buildArgs);
 
         exec(

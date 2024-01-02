@@ -1,4 +1,6 @@
 import { spawnSync, SpawnSyncOptions } from 'child_process';
+import { readFileSync } from 'fs';
+import * as toml from 'toml';
 
 export interface CallSite {
   getThis(): any;
@@ -14,6 +16,44 @@ export interface CallSite {
   isToplevel(): boolean;
   isEval(): boolean;
   isConstructor(): boolean;
+}
+
+/**
+ * Base layout of a Rust manifest file
+ */
+export interface TomlProps {
+  readonly package: {
+    name: string;
+  };
+  readonly workspace: {
+    members: string[];
+  };
+}
+
+export function getPackageName(entry: string) {
+  try {
+    const contents = readFileSync(entry, 'utf8');
+    let data: TomlProps = toml.parse(contents);
+    return data.package.name;
+  } catch (err) {
+    throw new Error(
+      `Unable to parse Manifest file \`${entry}\`\n` +
+        `${err}\n`,
+    );
+  }
+}
+
+export function isWorkspace(entry: string) {
+  try {
+    const contents = readFileSync(entry, 'utf8');
+    let data: TomlProps = toml.parse(contents);
+    return data.workspace && data.workspace.members && data.workspace.members.length > 0;
+  } catch (err) {
+    throw new Error(
+      `Unable to parse Manifest file \`${entry}\`\n` +
+        `${err}\n`,
+    );
+  }
 }
 
 /**

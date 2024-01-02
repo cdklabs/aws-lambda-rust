@@ -31,8 +31,14 @@ jspm_packages/
 *.tgz
 .yarn-integrity
 .cache
-.idea/
-.Cargo.lock
+*.d.ts
+*.generated.ts
+*.js
+**/integ.*.snapshot/asset.*/
+**/bin
+**/obj
+/*.sln
+**/target
 !/.projenrc.js
 /test-reports/
 junit.xml
@@ -57,4 +63,3 @@ tsconfig.json
 !/.github/workflows/upgrade-cdklabs-projen-project-types-main.yml
 !/.github/workflows/upgrade-main.yml
 !/.github/workflows/upgrade-dev-deps-main.yml
-!/test/tsconfig.json

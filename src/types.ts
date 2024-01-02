@@ -20,13 +20,6 @@ export interface BundlingOptions extends DockerRunOptions {
   readonly profile?: string;
 
   /**
-   * Build optimized artifacts with the release profile
-   *
-   * @default - true
-   */
-  readonly release?: boolean;
-
-  /**
    * A list of features to activate when compiling Rust code.
    */
   readonly features?: string[];

@@ -57,7 +57,7 @@
     "eslint-plugin-import": "^2.29.0",
     "jest": "^27",
     "jest-junit": "^15",
-    "jsii": "~5.0.0",
+    "jsii": "~5.3.0",
     "jsii-diff": "^1.93.0",
     "jsii-docgen": "^10.2.5",
     "jsii-pacmak": "^1.93.0",
@@ -66,18 +66,18 @@
     "standard-version": "^9",
     "ts-jest": "^27",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "~5.3.3"
   },
   "peerDependencies": {
     "aws-cdk-lib": "^2.114.0",
     "constructs": "^10.0.5"
   },
+  "dependencies": {
+    "toml": "^3.0.0"
+  },
   "keywords": [
     "cdk"
   ],
-  "engines": {
-    "node": ">= 16.13.0"
-  },
   "main": "lib/index.js",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -130,19 +130,19 @@
     "outdir": "dist",
     "targets": {
       "java": {
-        "package": "software.amazon.awscdk.cdk.lambda.rust",
+        "package": "io.github.cdklabs.aws.lambda.rust",
         "maven": {
-          "groupId": "software.amazon.awscdk",
+          "groupId": "io.github.cdklabs",
           "artifactId": "aws-lambda-rust"
         }
       },
       "python": {
-        "distName": "aws-cdk.aws-lambda-rust",
-        "module": "aws_cdk.aws_lambda_rust"
+        "distName": "cdklabs.aws-lambda-rust",
+        "module": "cdklabs.aws_lambda_rust"
       },
       "dotnet": {
-        "namespace": "Amazon.CDK.Lambda..Rust",
-        "packageId": "Amazon.CDK.Lambda..Rust"
+        "namespace": "Cdklabs.AwsLambdaRust",
+        "packageId": "Cdklabs.AwsLambdaRust"
       },
       "go": {
         "moduleName": "github.com/cdklabs/aws-lambda-rust-go"
