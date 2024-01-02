@@ -93,6 +93,10 @@
       "type": "build"
     },
     {
+      "name": "toml",
+      "type": "bundled"
+    },
+    {
       "name": "@aws-cdk/integ-runner",
       "version": "latest",
       "type": "devenv"
@@ -111,10 +115,6 @@
       "name": "constructs",
       "version": "^10.0.5",
       "type": "peer"
-    },
-    {
-      "name": "toml",
-      "type": "runtime"
     },
     {
       "name": "@aws-cdk/integ-tests-alpha",

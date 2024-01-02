@@ -18,23 +18,33 @@ export interface CallSite {
   isConstructor(): boolean;
 }
 
+export interface Package {
+  name: string;
+}
+
 /**
  * Base layout of a Rust manifest file
  */
 export interface TomlProps {
-  readonly package: {
-    name: string;
-  };
-  readonly workspace: {
+  readonly package?: Package;
+  readonly workspace?: {
     members: string[];
   };
+  readonly bin?: Package[];
 }
 
-export function getPackageName(entry: string) {
+/**
+ * Get Manifest binary name
+ * @param entry the Manifest file path
+ */
+export function getBinaryName(entry: string) {
   try {
     const contents = readFileSync(entry, 'utf8');
     let data: TomlProps = toml.parse(contents);
-    return data.package.name;
+    if (data.bin && data.bin.length == 1) {
+      return data.bin[0].name;
+    }
+    return data.package?.name;
   } catch (err) {
     throw new Error(
       `Unable to parse Manifest file \`${entry}\`\n` +
@@ -43,6 +53,24 @@ export function getPackageName(entry: string) {
   }
 }
 
+
+export function hasMultipleBinaries(entry: string) {
+  try {
+    const contents = readFileSync(entry, 'utf8');
+    let data: TomlProps = toml.parse(contents);
+    return data.bin && data.bin.length > 1;
+  } catch (err) {
+    throw new Error(
+      `Unable to parse Manifest file \`${entry}\`\n` +
+        `${err}\n`,
+    );
+  }
+}
+
+/**
+ * Check if the given Manifest contains multiple workspaces
+ * @param entry the Manifest file path
+ */
 export function isWorkspace(entry: string) {
   try {
     const contents = readFileSync(entry, 'utf8');

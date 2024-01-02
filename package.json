@@ -75,6 +75,9 @@
   "dependencies": {
     "toml": "^3.0.0"
   },
+  "bundledDependencies": [
+    "toml"
+  ],
   "keywords": [
     "cdk"
   ],

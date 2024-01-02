@@ -9,7 +9,7 @@ const project = new CdklabsConstructLibrary({
   typescriptVersion: '~5.3.3',
   defaultReleaseBranch: 'main',
   devDeps: ['cdklabs-projen-project-types', '@aws-cdk/integ-tests-alpha'],
-  deps: ['toml'],
+  bundledDeps: ['toml'],
   name: '@aws-cdk/aws-lambda-rust',
   projenrcTs: true,
   npmAccess: NpmAccess.PUBLIC,

@@ -33,7 +33,7 @@ pub(crate) async fn my_handler(event: Request, ctx: LambdaContext) -> Response {
     info!("Request: {:?}", event);
 
     // retrieve an environment variable set at build (compile) time.
-    let rust_lang_url = env!("LEARN_RUST_URL");
+    let rust_lang_url = "https://www.rust-lang.org/learn";
 
     // extract some useful info from the request
     let command = event.command;

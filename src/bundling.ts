@@ -12,7 +12,7 @@ import {
 } from 'aws-cdk-lib/core';
 import { PackageManager, PackageManagerType } from './package-manager';
 import { BundlingOptions, LogLevel } from './types';
-import { checkInstalledTarget, exec } from './util';
+import { checkInstalledTarget, exec, getBinaryName, hasMultipleBinaries, isWorkspace } from './util';
 
 /**
  * Bundling properties
@@ -171,37 +171,34 @@ export class Bundling implements CdkBundlingOptions {
   public createBundlingCommand(options: BundlingCommandOptions): string {
     const pathJoin = osPathJoin(options.osPlatform);
     const osPlatform = os.platform();
-    const sourceBootstrap = pathJoin(options.inputDir, 'target', this.target, 'release');
-    const targetBootstrap= pathJoin(options.outputDir, 'bootstrap');
-
-    let packageName = '';
-
     let relativeManifestPath = pathJoin(
       options.inputDir,
       this.relativeEntryPath,
     );
+    let binaryName;
 
     const buildCommand: string[] = [
       options.buildRunner,
       `--manifest-path=${relativeManifestPath}`,
-      ...(this.props.packageName
-        ? [`--package=${this.props.packageName}`]
-        : []),
-      ...(this.props.binaryName ? [`--bin=${this.props.binaryName}`] : []),
-      ...(this.props.profile ? [`--profile=${this.props.profile}`] : []),
+      `--target ${this.target}`,
       ...options.buildArgs,
     ];
 
     if (this.props.binaryName) {
-      buildCommand.push('--bin', this.props.binaryName);
-      packageName = this.props.binaryName;
+      binaryName = this.props.binaryName;
+    } else if (isWorkspace(relativeManifestPath) || hasMultipleBinaries(relativeManifestPath)) {
+      throw new Error('Your Cargo project is a workspace or contains multiple binaries, use the property `binaryName` to specify the binary to use.');
+    } else {
+      binaryName = getBinaryName(relativeManifestPath);
     }
 
-    // Target
-    if (this.packageManager.crossCompile) {
-      buildCommand.push(
-        `--target ${this.target}`,
-      );
+    if (!binaryName) {
+      throw new Error('Your Cargo project is missing the package name or a [[bin]] section, use the property `binaryName` to specify the binary to use');
+    }
+    buildCommand.push('--bin', binaryName);
+
+    if (this.props.packageName) {
+      buildCommand.push('--package', this.props.packageName);
     }
 
     // Features
@@ -217,6 +214,8 @@ export class Bundling implements CdkBundlingOptions {
     }
 
     // Move target file to destination
+    const sourceBootstrap = pathJoin(options.inputDir, 'target', this.target, 'release', binaryName);
+    const targetBootstrap= pathJoin(options.outputDir, 'target', 'cdk-asset', binaryName, 'bootstrap');
     const moveCommand: string =
         osPlatform === 'win32'
           ? ['powershell', '-command', 'Move-Item', '-Path', sourceBootstrap, '-Destination', targetBootstrap]

@@ -4,6 +4,7 @@ import { Match, Template } from 'aws-cdk-lib/assertions';
 import { CodeConfig, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { RustFunction } from '../lib';
 import { Bundling } from '../lib/bundling';
+import * as util from '../lib/util';
 
 jest.mock('../lib/bundling', () => {
   return {
@@ -28,7 +29,12 @@ jest.mock('../lib/bundling', () => {
 let stack: Stack;
 beforeEach(() => {
   stack = new Stack();
+
   jest.clearAllMocks();
+
+  jest.spyOn(util, 'isWorkspace').mockReturnValue(false);
+  jest.spyOn(util, 'hasMultipleBinaries').mockReturnValue(false);
+  jest.spyOn(util, 'getBinaryName').mockReturnValue('testBin');
 });
 
 test('RustFunction with defaults', () => {

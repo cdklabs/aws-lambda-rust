@@ -3,6 +3,15 @@ name = "rust-bins"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "my_lambda1"
+path = "src/bin/my_lambda1/main.rs"
+
+[[bin]]
+name = "my_lambda2"
+path = "src/bin/my_lambda2/main.rs"
+
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
