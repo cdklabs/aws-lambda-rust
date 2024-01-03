@@ -29,9 +29,7 @@ jest.mock('../lib/bundling', () => {
 let stack: Stack;
 beforeEach(() => {
   stack = new Stack();
-
   jest.clearAllMocks();
-
   jest.spyOn(util, 'isWorkspace').mockReturnValue(false);
   jest.spyOn(util, 'hasMultipleBinaries').mockReturnValue(false);
   jest.spyOn(util, 'getBinaryName').mockReturnValue('testBin');
@@ -118,7 +116,7 @@ test('throws when entry does not exist', () => {
       new RustFunction(stack, 'Fn', {
         entry: 'folder/Cargo.toml',
       }),
-  ).toThrow(/Cannot find entry file at/);
+  ).toThrow(/Cannot find manifest file at folder/);
 });
 
 test('throws when entry cannot be automatically found', () => {

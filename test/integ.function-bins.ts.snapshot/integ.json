@@ -1,0 +1,13 @@
+{
+  "version": "35.0.0",
+  "testCases": {
+    "lambda-rust-function/DefaultTest": {
+      "stacks": [
+        "integ-lambda-rust-function-bins"
+      ],
+      "stackUpdateWorkflow": false,
+      "assertionStack": "lambda-rust-function/DefaultTest/DeployAssert",
+      "assertionStackName": "lambdarustfunctionDefaultTestDeployAssert1211A947"
+    }
+  }
+}

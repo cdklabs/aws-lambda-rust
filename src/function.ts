@@ -26,18 +26,11 @@ export interface RustFunctionProps extends FunctionOptions {
   readonly entry?: string;
 
   /**
-   * The name of the binary to build, in case that's different than the package's name.
+   * The name of the binary to build, in case that it's different that the package's name.
    *
    * @default Build all binaries
    */
   readonly binaryName?: string;
-
-  /**
-   * the name of the workspace package to build
-   *
-   * @default Build all packages in the workspace
-   */
-  readonly packageName?: string;
 
   /**
    * The runtime environment. Only OS-only runtimes are supported.
@@ -73,9 +66,8 @@ export class RustFunction extends Function {
 
     // Entry and defaults
     const entry = path.resolve(findEntry(id, props.entry));
-    const projectRoot = props.projectRoot ?? path.dirname(entry);
     // Handler is not important for Rust function
-    const handler = 'not-used';
+    const handler = 'rust.handler';
     const architecture = props.architecture ?? Architecture.X86_64;
     const runtime = props.runtime ?? Runtime.PROVIDED_AL2023;
 
@@ -87,9 +79,7 @@ export class RustFunction extends Function {
         entry,
         runtime,
         architecture,
-        projectRoot,
         binaryName: props.binaryName,
-        packageName: props.packageName,
       }),
       handler: handler,
     });
@@ -109,7 +99,7 @@ function findEntry(id: string, entry?: string): string {
       );
     }
     if (!fs.existsSync(entry)) {
-      throw new Error(`Cannot find entry file at ${entry}`);
+      throw new Error(`Cannot find manifest file at ${entry}`);
     }
     return entry;
   }

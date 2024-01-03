@@ -13,7 +13,8 @@ class TestStack extends Stack {
     super(scope, id, props);
 
     const fn = new RustFunction(this, 'binary1', {
-      entry: 'rust-standalone/Cargo.toml',
+      entry: 'rust-workspaces/Cargo.toml',
+      binaryName: 'my_lambda2',
       bundling: {
         forceDockerBundling: false,
       },
@@ -27,7 +28,7 @@ class TestStack extends Stack {
 }
 
 const app = new App();
-const testCase = new TestStack(app, 'integ-lambda-rust-function');
+const testCase = new TestStack(app, 'integ-lambda-rust-function-workspace');
 const integ = new IntegTest(app, 'lambda-rust-function', {
   testCases: [testCase],
   stackUpdateWorkflow: false,
@@ -39,7 +40,7 @@ const invoke = integ.assertions.invokeFunction({
 
 invoke.expect(
   ExpectedResult.objectLike( {
-    Payload: '{"statusCode":200,"headers":{},"multiValueHeaders":{},"body":"OK","isBase64Encoded":false}',
+    Payload: '{"statusCode":200,"headers":{},"multiValueHeaders":{},"body":"OK2","isBase64Encoded":false}',
   }),
 );
 app.synth();

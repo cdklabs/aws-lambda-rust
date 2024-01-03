@@ -1,13 +1,14 @@
 // src/main.rs
 
 use lambda_http::{run, service_fn, Body, Error, Request, RequestExt, Response};
+use lambda_http::http::StatusCode;
 
 async fn function_handler(event: Request) -> Result<Response<Body>, Error> {
     let resp = Response::builder()
-        .status(200)
-        .header("content-type", "text/html")
-        .body("Hello AWS Lambda HTTP request".into())
+        .status(StatusCode::OK)
+        .body("OK".into())
         .map_err(Box::new)?;
+
     Ok(resp)
 }
 

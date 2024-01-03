@@ -1,5 +1,7 @@
 import * as child_process from 'child_process';
 import * as os from 'os';
+// @ts-ignore
+import path from 'path';
 import { Architecture, Code, Runtime } from 'aws-cdk-lib/aws-lambda';
 import {
   AssetHashType,
@@ -46,14 +48,13 @@ beforeEach(() => {
   });
 });
 
-const projectRoot = '/project/lib';
-const entry = '/project/lib/Cargo.toml';
+const projectRoot = 'project';
+const entry = 'project/Cargo.toml';
 
 describe('Bundling in Docker', () => {
   test('using cargo-zigbuild', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -93,7 +94,6 @@ describe('Bundling in Docker', () => {
   test('with specific binary', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       binaryName: 'test',
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
@@ -120,8 +120,6 @@ describe('Bundling in Docker', () => {
   test('with specific package', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
-      packageName: 'testPackage',
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -147,7 +145,6 @@ describe('Bundling in Docker', () => {
   test('with Verbose logLevel', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -174,7 +171,6 @@ describe('Bundling in Docker', () => {
   test('with Silent logLevel', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -200,10 +196,13 @@ describe('Bundling in Docker', () => {
 
   test('with Windows path', () => {
     const osPlatformMock = jest.spyOn(os, 'platform').mockReturnValue('win32');
+    // Mock path.basename() because it cannot extract the basename of a Windows
+    // path when running on Linux
+    jest.spyOn(path, 'basename').mockReturnValueOnce('Cargo.toml');
+    jest.spyOn(path, 'relative').mockReturnValueOnce('lib\\Cargo.toml').mockReturnValueOnce('Cargo.toml');
 
     Bundling.bundle({
       entry: 'C:\\my-project\\lib\\Cargo.toml',
-      projectRoot: 'C:\\my-project\\lib',
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -226,7 +225,6 @@ describe('Bundling in Docker', () => {
   test('with ARM target', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: Architecture.ARM_64,
       forceDockerBundling: true,
@@ -252,7 +250,6 @@ describe('Bundling in Docker', () => {
   test('with extra build args', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -279,7 +276,6 @@ describe('Bundling in Docker', () => {
   test('with custom Docker image', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -297,7 +293,6 @@ describe('Bundling in Docker', () => {
   test('with Docker build args', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       buildArgs: {
@@ -319,7 +314,6 @@ describe('Bundling in Docker', () => {
   test('with command hooks', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -353,7 +347,6 @@ describe('Bundling in Docker', () => {
   test('with custom hash', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       forceDockerBundling: true,
       assetHash: 'custom',
@@ -373,7 +366,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling entrypoint', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -391,7 +383,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling volumes', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: Architecture.X86_64,
       forceDockerBundling: true,
@@ -409,7 +400,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling volumesFrom', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -427,7 +417,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling workingDirectory', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -445,7 +434,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling user', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -463,7 +451,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling securityOpt', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -481,7 +468,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling network', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -499,7 +485,6 @@ describe('Bundling in Docker', () => {
   test('Custom bundling file copy variant', () => {
     Bundling.bundle({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       forceDockerBundling: true,
@@ -539,7 +524,6 @@ describe('Bundling locally', () => {
 
     const bundler = new Bundling({
       entry,
-      projectRoot,
       runtime: STANDARD_RUNTIME,
       architecture: STANDARD_ARCHITECTURE,
       environment: {
@@ -559,7 +543,7 @@ describe('Bundling locally', () => {
       expect.arrayContaining(['-c', expect.stringContaining(entry)]),
       expect.objectContaining({
         env: expect.objectContaining({ KEY: 'value' }),
-        cwd: '/project/lib',
+        cwd: projectRoot,
       }),
     );
 

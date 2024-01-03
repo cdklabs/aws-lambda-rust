@@ -43,18 +43,6 @@ export interface BundlingProps extends BundlingOptions {
   readonly binaryName?: string;
 
   /**
-   * Package to build
-   *
-   * @default Build all packages in the workspace
-   */
-  readonly packageName?: string;
-
-  /**
-   * Path to project root
-   */
-  readonly projectRoot: string;
-
-  /**
    * The type of package manager to use
    *
    * @default - PackageManagerType.CARGO_ZIGBUILD
@@ -101,24 +89,16 @@ export class Bundling implements CdkBundlingOptions {
   public readonly local?: ILocalBundling;
   public readonly bundlingFileAccess?: BundlingFileAccess;
 
-  private readonly projectRoot: string;
   private readonly packageManager: PackageManager;
-  private readonly relativeEntryPath: string;
   private readonly target: string;
 
   constructor(private readonly props: BundlingProps) {
     const packageManagerType =
       props.packageManagerType ?? PackageManagerType.CARGO_ZIGBUILD;
-
-    this.projectRoot = props.projectRoot;
     this.packageManager = PackageManager.fromType(packageManagerType);
     this.target = this.props.target && isValidTarget(this.props.target)
       ? this.props.target
       : toTarget(this.props.architecture);
-    this.relativeEntryPath = path.relative(
-      this.projectRoot,
-      path.resolve(props.entry),
-    );
 
     const buildArgs = ['--release', '--color', 'always'];
     if (props.extraBuildArgs) {
@@ -171,10 +151,10 @@ export class Bundling implements CdkBundlingOptions {
   public createBundlingCommand(options: BundlingCommandOptions): string {
     const pathJoin = osPathJoin(options.osPlatform);
     const osPlatform = os.platform();
-    let relativeManifestPath = pathJoin(
+    let relativeManifestPath = options.inputDir ? pathJoin(
       options.inputDir,
-      this.relativeEntryPath,
-    );
+      path.relative(path.dirname(this.props.entry), this.props.entry),
+    ) : this.props.entry;
     let binaryName;
 
     const buildCommand: string[] = [
@@ -186,20 +166,16 @@ export class Bundling implements CdkBundlingOptions {
 
     if (this.props.binaryName) {
       binaryName = this.props.binaryName;
-    } else if (isWorkspace(relativeManifestPath) || hasMultipleBinaries(relativeManifestPath)) {
+    } else if (isWorkspace(this.props.entry) || hasMultipleBinaries(this.props.entry)) {
       throw new Error('Your Cargo project is a workspace or contains multiple binaries, use the property `binaryName` to specify the binary to use.');
     } else {
-      binaryName = getBinaryName(relativeManifestPath);
+      binaryName = getBinaryName(this.props.entry);
     }
 
     if (!binaryName) {
       throw new Error('Your Cargo project is missing the package name or a [[bin]] section, use the property `binaryName` to specify the binary to use');
     }
     buildCommand.push('--bin', binaryName);
-
-    if (this.props.packageName) {
-      buildCommand.push('--package', this.props.packageName);
-    }
 
     // Features
     if (this.props.features) {
@@ -214,8 +190,8 @@ export class Bundling implements CdkBundlingOptions {
     }
 
     // Move target file to destination
-    const sourceBootstrap = pathJoin(options.inputDir, 'target', this.target, 'release', binaryName);
-    const targetBootstrap= pathJoin(options.outputDir, 'target', 'cdk-asset', binaryName, 'bootstrap');
+    const sourceBootstrap = pathJoin(path.dirname(relativeManifestPath), 'target', this.target, 'release', binaryName);
+    const targetBootstrap= pathJoin(options.outputDir, 'bootstrap');
     const moveCommand: string =
         osPlatform === 'win32'
           ? ['powershell', '-command', 'Move-Item', '-Path', sourceBootstrap, '-Destination', targetBootstrap]
@@ -243,7 +219,7 @@ export class Bundling implements CdkBundlingOptions {
     const projectRoot = path.dirname(this.props.entry);
     const createLocalCommand = (outputDir: string, buildArgs: string[]) =>
       this.createBundlingCommand({
-        inputDir: projectRoot,
+        inputDir: '',
         outputDir,
         buildRunner: this.packageManager.runBuildCommand(),
         osPlatform,
