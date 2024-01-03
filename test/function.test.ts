@@ -46,7 +46,7 @@ test('RustFunction with defaults', () => {
   );
 
   Template.fromStack(stack).hasResourceProperties('AWS::Lambda::Function', {
-    Handler: 'not-used',
+    Handler: 'rust.handler',
     Runtime: Match.stringLikeRegexp('provided'),
   });
 });
@@ -70,22 +70,7 @@ test('RustFunction with container env vars', () => {
   );
 });
 
-test('RustFunction with specific package', () => {
-  // WHEN
-  new RustFunction(stack, 'binary1', {
-    entry: path.join(__dirname, 'rust-workspaces/Cargo.toml'),
-    packageName: 'my_lambda1',
-  });
-
-  expect(Bundling.bundle).toHaveBeenCalledWith(
-    expect.objectContaining({
-      packageName: 'my_lambda1',
-    }),
-  );
-});
-
-
-test('RustFunction with specific bins', () => {
+test('RustFunction with specific binary', () => {
   // WHEN
   new RustFunction(stack, 'binary1', {
     entry: path.join(__dirname, 'rust-workspaces/Cargo.toml'),
