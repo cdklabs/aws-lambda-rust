@@ -3,9 +3,8 @@ ARG RUST_VERSION=1.74.0
 FROM rust:$RUST_VERSION
 
 # Install Rust tools and targets
-RUN set -eux; \
-    rustup toolchain install stable; \
-    rustup target install x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu;
+RUN rustup toolchain install stable
+RUN rustup target install x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu
 
 RUN --mount=type=cache,target=/usr/local/cargo/registry
 
