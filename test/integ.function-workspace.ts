@@ -16,7 +16,7 @@ class TestStack extends Stack {
       entry: 'rust-workspaces/Cargo.toml',
       binaryName: 'my_lambda2',
       bundling: {
-        forceDockerBundling: false,
+        forceDockerBundling: true,
       },
     });
     this.functionName = fn.functionName;
@@ -31,7 +31,7 @@ const app = new App();
 const testCase = new TestStack(app, 'integ-lambda-rust-function-workspace');
 const integ = new IntegTest(app, 'lambda-rust-function', {
   testCases: [testCase],
-  stackUpdateWorkflow: true,
+  stackUpdateWorkflow: false,
 });
 
 const invoke = integ.assertions.invokeFunction({
