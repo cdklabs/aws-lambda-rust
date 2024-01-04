@@ -31,7 +31,7 @@ const app = new App();
 const testCase = new TestStack(app, 'integ-lambda-rust-function-workspace');
 const integ = new IntegTest(app, 'lambda-rust-function', {
   testCases: [testCase],
-  stackUpdateWorkflow: false,
+  stackUpdateWorkflow: true,
 });
 
 const invoke = integ.assertions.invokeFunction({

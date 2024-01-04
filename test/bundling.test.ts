@@ -75,7 +75,6 @@ describe('Bundling in Docker', () => {
             '-c',
             'cargo-zigbuild zigbuild --manifest-path=/asset-input/Cargo.toml --target x86_64-unknown-linux-gnu --release --color always --bin testBin && mv /asset-input/target/x86_64-unknown-linux-gnu/release/testBin /asset-output/bootstrap',
           ],
-          workingDirectory: '/',
         }),
       }),
     );
@@ -111,7 +110,6 @@ describe('Bundling in Docker', () => {
             '-c',
             'cargo-zigbuild zigbuild --manifest-path=/asset-input/Cargo.toml --target x86_64-unknown-linux-gnu --release --color always --bin test && mv /asset-input/target/x86_64-unknown-linux-gnu/release/test /asset-output/bootstrap',
           ],
-          workingDirectory: '/',
         }),
       }),
     );
@@ -137,7 +135,6 @@ describe('Bundling in Docker', () => {
             '-c',
             'cargo-zigbuild zigbuild --manifest-path=/asset-input/Cargo.toml --target x86_64-unknown-linux-gnu --release --color always --bin testBin --verbose && mv /asset-input/target/x86_64-unknown-linux-gnu/release/testBin /asset-output/bootstrap',
           ],
-          workingDirectory: '/',
         }),
       }),
     );
@@ -163,7 +160,6 @@ describe('Bundling in Docker', () => {
             '-c',
             'cargo-zigbuild zigbuild --manifest-path=/asset-input/Cargo.toml --target x86_64-unknown-linux-gnu --release --color always --bin testBin --silent && mv /asset-input/target/x86_64-unknown-linux-gnu/release/testBin /asset-output/bootstrap',
           ],
-          workingDirectory: '/',
         }),
       }),
     );
@@ -216,7 +212,6 @@ describe('Bundling in Docker', () => {
             '-c',
             'cargo-zigbuild zigbuild --manifest-path=/asset-input/Cargo.toml --target aarch64-unknown-linux-gnu --release --color always --bin testBin && mv /asset-input/target/aarch64-unknown-linux-gnu/release/testBin /asset-output/bootstrap',
           ],
-          workingDirectory: '/',
         }),
       }),
     );
@@ -242,7 +237,6 @@ describe('Bundling in Docker', () => {
             '-c',
             'cargo-zigbuild zigbuild --manifest-path=/asset-input/Cargo.toml --target x86_64-unknown-linux-gnu --release --color always --frozen --offline --bin testBin && mv /asset-input/target/x86_64-unknown-linux-gnu/release/testBin /asset-output/bootstrap',
           ],
-          workingDirectory: '/',
         }),
       }),
     );

@@ -93,14 +93,18 @@ export class RustFunction extends Function {
  */
 function findEntry(id: string, entry?: string): string {
   if (entry) {
+
     if (!/\Cargo.toml$/.test(entry)) {
-      throw new Error(
-        'Only entry pointing to a manifest (Cargo.toml) file are supported.',
-      );
+      // Only Cargo.toml files are supported.
+      // If the user gave a path to a directory, we'll look for a Cargo.toml file in it.
+      // If the user gave a path to a file, we'll use it as-is.
+      entry = path.join(entry, 'Cargo.toml');
     }
+
     if (!fs.existsSync(entry)) {
       throw new Error(`Cannot find manifest file at ${entry}`);
     }
+
     return entry;
   }
 

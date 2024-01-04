@@ -1,5 +1,6 @@
 import { ExpectedResult, IntegTest } from '@aws-cdk/integ-tests-alpha';
 import { App, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { Architecture } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { RustFunction } from '../lib';
 
@@ -13,10 +14,10 @@ class TestStack extends Stack {
     super(scope, id, props);
 
     const fn = new RustFunction(this, 'binary1', {
-      entry: 'rust-bins/Cargo.toml',
-      binaryName: 'my_lambda1',
+      entry: 'rust-standalone/Cargo.toml',
+      architecture: Architecture.ARM_64,
       bundling: {
-        forceDockerBundling: false,
+        forceDockerBundling: true,
       },
     });
     this.functionName = fn.functionName;
@@ -28,10 +29,10 @@ class TestStack extends Stack {
 }
 
 const app = new App();
-const testCase = new TestStack(app, 'integ-lambda-rust-function-bins');
+const testCase = new TestStack(app, 'integ-lambda-rust-function-arm');
 const integ = new IntegTest(app, 'lambda-rust-function', {
   testCases: [testCase],
-  stackUpdateWorkflow: true,
+  stackUpdateWorkflow: false,
 });
 
 const invoke = integ.assertions.invokeFunction({
@@ -40,7 +41,7 @@ const invoke = integ.assertions.invokeFunction({
 
 invoke.expect(
   ExpectedResult.objectLike( {
-    Payload: '{"statusCode":200,"headers":{},"multiValueHeaders":{},"body":"OK1","isBase64Encoded":false}',
+    Payload: '{"statusCode":200,"headers":{},"multiValueHeaders":{},"body":"OK","isBase64Encoded":false}',
   }),
 );
 app.synth();

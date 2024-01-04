@@ -5,7 +5,7 @@
       "stacks": [
         "integ-lambda-rust-function-workspace"
       ],
-      "stackUpdateWorkflow": false,
+      "stackUpdateWorkflow": true,
       "assertionStack": "lambda-rust-function/DefaultTest/DeployAssert",
       "assertionStackName": "lambdarustfunctionDefaultTestDeployAssert1211A947"
     }

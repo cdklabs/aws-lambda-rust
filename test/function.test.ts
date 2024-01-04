@@ -84,15 +84,18 @@ test('RustFunction with specific binary', () => {
   );
 });
 
-test('throws when entry is not Cargo.toml', () => {
-  expect(
-    () =>
-      new RustFunction(stack, 'Fn', {
-        entry: 'NotToml/',
-      }),
-  ).toThrow(
-    'Only entry pointing to a manifest (Cargo.toml) file are supported.',
+test('Find manifest when entry is a directory', () => {
+
+  new RustFunction(stack, 'Fn', {
+    entry: path.join(__dirname, 'rust-standalone'),
+  });
+
+  expect(Bundling.bundle).toHaveBeenCalledWith(
+    expect.objectContaining({
+      entry: expect.stringContaining('Cargo.toml'),
+    }),
   );
+
 });
 
 test('throws when entry does not exist', () => {
