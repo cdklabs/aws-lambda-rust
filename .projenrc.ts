@@ -1,6 +1,5 @@
 import { CdklabsConstructLibrary } from 'cdklabs-projen-project-types';
 import { DependencyType } from 'projen';
-import { NpmAccess } from 'projen/lib/javascript';
 const project = new CdklabsConstructLibrary({
   author: 'AWS',
   authorAddress: 'aws-cdk-dev@amazon.com',
@@ -12,7 +11,8 @@ const project = new CdklabsConstructLibrary({
   bundledDeps: ['toml'],
   name: '@aws-cdk/aws-lambda-rust',
   projenrcTs: true,
-  npmAccess: NpmAccess.PUBLIC,
+  private: false,
+  enablePRAutoMerge: true,
   stability: 'experimental',
   setNodeEngineVersion: false,
   repositoryUrl: 'https://github.com/cdklabs/aws-lambda-rust.git',
