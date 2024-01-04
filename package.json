@@ -133,19 +133,19 @@
     "outdir": "dist",
     "targets": {
       "java": {
-        "package": "io.github.cdklabs.aws.lambda.rust",
+        "package": "software.amazon.awscdk.services.lambda.rust",
         "maven": {
-          "groupId": "io.github.cdklabs",
-          "artifactId": "aws-lambda-rust"
+          "groupId": "software.amazon.awscdk",
+          "artifactId": "lambda-rust"
         }
       },
       "python": {
-        "distName": "cdklabs.aws-lambda-rust",
-        "module": "cdklabs.aws_lambda_rust"
+        "distName": "aws-cdk.aws-lambda-rust",
+        "module": "aws_cdk.aws_lambda_rust"
       },
       "dotnet": {
-        "namespace": "Cdklabs.AwsLambdaRust",
-        "packageId": "Cdklabs.AwsLambdaRust"
+        "namespace": "Amazon.CDK.AWS.Lambda.Rust",
+        "packageId": "Amazon.CDK.AWS.Lambda.Rust"
       },
       "go": {
         "moduleName": "github.com/cdklabs/aws-lambda-rust-go"

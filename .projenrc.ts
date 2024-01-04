@@ -1,5 +1,6 @@
-import { CdklabsConstructLibrary } from 'cdklabs-projen-project-types';
+import { CdklabsConstructLibrary, JsiiLanguage } from 'cdklabs-projen-project-types';
 import { DependencyType } from 'projen';
+
 const project = new CdklabsConstructLibrary({
   author: 'AWS',
   authorAddress: 'aws-cdk-dev@amazon.com',
@@ -16,6 +17,26 @@ const project = new CdklabsConstructLibrary({
   stability: 'experimental',
   setNodeEngineVersion: false,
   repositoryUrl: 'https://github.com/cdklabs/aws-lambda-rust.git',
+  jsiiTargetLanguages: [
+    JsiiLanguage.JAVA,
+    JsiiLanguage.PYTHON,
+    JsiiLanguage.DOTNET,
+    JsiiLanguage.GO,
+  ],
+  publishToMaven: {
+    javaPackage: 'software.amazon.awscdk.services.lambda.rust',
+    mavenGroupId: 'software.amazon.awscdk',
+    mavenArtifactId: 'lambda-rust',
+    mavenEndpoint: 'https://aws.oss.sonatype.org',
+  },
+  publishToPypi: {
+    distName: 'aws-cdk.aws-lambda-rust',
+    module: 'aws_cdk.aws_lambda_rust',
+  },
+  publishToNuget: {
+    dotNetNamespace: 'Amazon.CDK.AWS.Lambda.Rust',
+    packageId: 'Amazon.CDK.AWS.Lambda.Rust',
+  },
   autoApproveOptions: {
     allowedUsernames: ['aws-cdk-automation', 'dependabot[bot]', 'mergify[bot]'],
     secret: 'GITHUB_TOKEN',
