@@ -10,8 +10,8 @@ import {
   DockerVolume,
   ILocalBundling,
 } from 'aws-cdk-lib/core';
-import { PackageManager, PackageManagerType } from './package-manager';
-import { BundlingOptions, LogLevel } from './types';
+import { PackageManager } from './package-manager';
+import { BundlingOptions, LogLevel, PackageManagerType } from './types';
 import { checkInstalledTarget, exec, getBinaryName, hasMultipleBinaries, isWorkspace } from './util';
 
 /**
@@ -41,13 +41,6 @@ export interface BundlingProps extends BundlingOptions {
    * @default Build all binaries
    */
   readonly binaryName?: string;
-
-  /**
-   * The type of package manager to use
-   *
-   * @default - PackageManagerType.CARGO_ZIGBUILD
-   */
-  readonly packageManagerType?: PackageManagerType;
 
   /**
    * Which option to use to copy the source files to the docker container and output files back

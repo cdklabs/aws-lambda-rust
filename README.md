@@ -18,7 +18,7 @@
 
 This library provides constructs for Rust Lambda functions.
 
-The `RustFunction` construct creates a Lambda function with automatic building and bundling of Rust code.
+The `rust.RustFunction` construct creates a Lambda function with automatic building and bundling of Rust code.
 
 To use this module you will either need to have `cargo-lambda` installed or Docker installed.
 
@@ -26,31 +26,37 @@ See [Local Bundling/Docker Bundling](#local-bundling) for more information.
 
 ## Rust Function
 
-By default, the construct will use directory where cdk was invoked as directory where Cargo file is located.
-
 ```plaintext
 .
-├── Cargo.toml
-└── src
-    └── main.rs
+├── my-construct.ts
+├── myconstruct.my_function
+│    ├── Cargo.toml
+│    └── src
+│        └── main.rs
 ```
 
-It will use the package name as defined in the main `Cargo.toml`:
+By default, the construct will use the name of the defining file and the construct's id to look up the entry file by following this pattern `defining-file.id/Cargo.toml`. In `my-construct.ts` above we have:
 
 ```typescript
-new RustFunction(this, "my_function");
+const myFunction = new rust.RustFunction(this, "my_function");
 ```
 
-Alternatively, `binaryName` and `manifestPath` properties can be specified to override this default behavior.
+Alternatively, `entry` and `binaryName` properties can be specified to override this default behavior. If no `binaryName` argument is passed in, it will default to the package name as defined in the main `Cargo.toml`.
 
 ```typescript
-new RustFunction(this, "my_function", {
-    manifestPath: '/path/to/directory/with/Cargo.toml',
-    binaryName: 'my_function',
+new rust.RustFunction(this, "my_function1", {
+    entry: '/path/to/directory/with/Cargo.toml',
+    binaryName: 'my_function'
+});
+
+// You can also specify entry path directory which will contain your Cargo.toml file
+new rust.RustFunction(this, "my_function2", {
+    entry: '/path/to/directory',
+    binaryName: 'my_function'
 });
 ```
 
-For more complex project structure combining multiple Rust Lambda function, the construct offer the ability to use [Workspaces](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html) defined in your Cargo project.
+For more complex project structure combining multiple Rust Lambda function, the construct offer the ability to use Binaries or  [Workspaces](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html) defined in your Cargo project.
 
 Given a sample project structure:
 
@@ -77,15 +83,33 @@ members = [
 ]
 ```
 
-Rust functions can be declared using `package` properties:
+Rust functions can be declared using `binaryName` property:
 
 ```typescript
-new RustFunction(this, 'FirstFunction', {
-    package: 'my_lambda_1',
+new rust.RustFunction(this, 'FirstFunction', {
+    binaryName: 'my_lambda_1',
 });
 
-new RustFunction(this, 'SecondFunction', {
-    package: 'my_lambda_2',
+new rust.RustFunction(this, 'SecondFunction', {
+    binaryName: 'my_lambda_2',
+});
+```
+
+## How It Works
+
+When bundling the code, the `rust.RustFunction` runs will build and bundle your binary by passing `--release` and `--target` flags to the Cargo build command, so it compiles for a Lambda environment - which defaults to the **aarch64-unknown-linux-gnu** target.
+
+### Use `cross` for Deployment
+
+If you instead prefer to use [Docker](https://www.docker.com/get-started) and [Cross](https://github.com/rust-embedded/cross) for deployment, as outlined
+in the [official AWS docs](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html), you can define the `packageManager` property:
+
+```typescript
+new rust.RustFunction(this, 'FirstFunction', {
+    binaryName: 'my_lambda_1',
+    bundling: {
+      packageManagerType: rust.PackageManagerType.CROSS
+    }
 });
 ```
 
@@ -106,14 +130,12 @@ By default, Construct will compile the code for Linux X86-64 architectures, but 
 ```typescript
 import { Architecture } from 'aws-cdk-lib/aws-lambda';
 
-new RustFunction(this, 'my_function', {
-    bundling: {
-        architecture: Architecture.ARM_64
-    }
+new rust.RustFunction(this, 'my_function', {
+    architecture: Architecture.ARM_64
 });
 ```
 
-If bundling is made locally for ARM-64 or X86-64, make sure to install the dedicated target:
+If bundling is made locally for **ARM-64** or **X86-64**, make sure to install the dedicated target:
 
 ```bash
 rustup target add aarch64-unknown-linux-gnu
@@ -127,7 +149,7 @@ To force bundling in a Docker container even if `Zig toolchain` is available in 
 Use `bundling.environment` to define environments variables when `cargo` runs:
 
 ```typescript
-new RustFunction(this, 'my_function', {
+new rust.RustFunction(this, 'my_function', {
   bundling: {
     environment: {
       HELLO: 'world'
@@ -139,7 +161,7 @@ new RustFunction(this, 'my_function', {
 Use the `bundling.buildArgs` to pass build arguments to `cargo`:
 
 ```typescript
-new go.RustFunction(this, 'my_function', {
+new rust.RustFunction(this, 'my_function', {
   bundling: {
     extraBuildArgs: ['--all-features'],
   },
@@ -149,7 +171,7 @@ new go.RustFunction(this, 'my_function', {
 Use the `bundling.dockerImage` to use a custom Docker bundling image:
 
 ```typescript
-new go.RustFunction(this, 'my_function', {
+new rust.RustFunction(this, 'my_function', {
   bundling: {
     dockerImage: DockerImage.fromBuild('/path/to/Dockerfile'),
   },
@@ -159,7 +181,7 @@ new go.RustFunction(this, 'my_function', {
 You can set additional Docker options to configure the build environment:
 
 ```typescript
-new RustFunction(this, 'my_function', {
+new rust.RustFunction(this, 'my_function', {
  bundling: {
      network: 'host',
      securityOpt: 'no-new-privileges',
@@ -172,29 +194,7 @@ new RustFunction(this, 'my_function', {
 
 ## Command hooks
 
-It is possible to run additional commands by specifying the commandHooks prop:
-
-```typescript
-// This example only available in TypeScript
-// Run additional props via `commandHooks`
-new RustFunction(this, 'my_function_with_commands', {
-  bundling: {
-    commandHooks: {
-      beforeBundling(inputDir: string, outputDir: string): string[] {
-        return [
-          `echo hello > ${inputDir}/a.txt`,
-          `cp ${inputDir}/a.txt ${outputDir}`,
-        ];
-      },
-      afterBundling(inputDir: string, outputDir: string): string[] {
-        return [`cp ${inputDir}/b.txt ${outputDir}/txt`];
-      }
-      // ...
-    },
-    // ...
-  },
-});
-```
+It is possible to run additional commands by specifying the commandHooks property.
 
 The following hooks are available:
 

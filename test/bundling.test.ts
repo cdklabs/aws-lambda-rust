@@ -8,9 +8,9 @@ import {
   BundlingFileAccess,
   DockerImage,
 } from 'aws-cdk-lib/core';
-import { LogLevel } from '../lib';
+import { LogLevel, PackageManagerType } from '../lib';
 import { Bundling } from '../lib/bundling';
-import { PackageManager, PackageManagerType } from '../lib/package-manager';
+import { PackageManager } from '../lib/package-manager';
 import * as util from '../lib/util';
 
 const STANDARD_RUNTIME = Runtime.PROVIDED_AL2023;

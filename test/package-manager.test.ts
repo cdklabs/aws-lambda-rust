@@ -1,5 +1,6 @@
 import * as child_process from 'child_process';
-import { PackageManager, PackageManagerType } from '../lib/package-manager';
+import { PackageManagerType } from '../lib';
+import { PackageManager } from '../lib/package-manager';
 
 jest.mock('child_process');
 

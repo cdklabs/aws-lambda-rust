@@ -1,4 +1,5 @@
 import * as os from 'os';
+import { PackageManagerType } from './types';
 import { canRunLocally } from './util';
 
 interface PackageManagerProps {
@@ -7,11 +8,6 @@ interface PackageManagerProps {
   readonly crossCompile: boolean;
   readonly runLocally: boolean;
   readonly type: PackageManagerType;
-}
-
-export enum PackageManagerType {
-  CARGO_ZIGBUILD,
-  CROSS,
 }
 
 /**

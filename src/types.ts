@@ -20,6 +20,13 @@ export interface BundlingOptions extends DockerRunOptions {
   readonly features?: string[];
 
   /**
+   * The type of package manager to use
+   *
+   * @default - PackageManagerType.CARGO_ZIGBUILD
+   */
+  readonly packageManagerType?: PackageManagerType;
+
+  /**
    * Force bundling in a Docker container even if local bundling is
    * possible.
    *
@@ -141,6 +148,11 @@ export interface ICommandHooks {
    * Commands are chained with `&&`.
    */
   afterBundling(inputDir: string, outputDir: string): string[];
+}
+
+export enum PackageManagerType {
+  CARGO_ZIGBUILD,
+  CROSS,
 }
 
 /**
