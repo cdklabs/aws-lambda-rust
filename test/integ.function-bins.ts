@@ -15,9 +15,6 @@ class TestStack extends Stack {
     const fn = new RustFunction(this, 'binary1', {
       entry: 'rust-bins/Cargo.toml',
       binaryName: 'my_lambda1',
-      bundling: {
-        forceDockerBundling: true,
-      },
     });
     this.functionName = fn.functionName;
 
