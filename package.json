@@ -1,5 +1,5 @@
 {
-  "name": "@aws-cdk/aws-lambda-rust",
+  "name": "@cdklabs/aws-lambda-rust",
   "repository": {
     "type": "git",
     "url": "https://github.com/cdklabs/aws-lambda-rust.git"

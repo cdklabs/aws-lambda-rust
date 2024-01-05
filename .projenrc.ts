@@ -10,7 +10,7 @@ const project = new CdklabsConstructLibrary({
   defaultReleaseBranch: 'main',
   devDeps: ['cdklabs-projen-project-types', '@aws-cdk/integ-tests-alpha'],
   bundledDeps: ['toml'],
-  name: '@aws-cdk/aws-lambda-rust',
+  name: '@cdklabs/aws-lambda-rust',
   projenrcTs: true,
   private: false,
   enablePRAutoMerge: true,
