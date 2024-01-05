@@ -1,0 +1,162 @@
+{
+  "version": "35.0.0",
+  "artifacts": {
+    "integ-lambda-rust-function.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "integ-lambda-rust-function.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "integ-lambda-rust-function": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "integ-lambda-rust-function.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e84178c7003a608a3eda47970229795ab45634fff430f7283ca35828db0261a3.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "integ-lambda-rust-function.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "integ-lambda-rust-function.assets"
+      ],
+      "metadata": {
+        "/integ-lambda-rust-function/binary1/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "binary1ServiceRole6833FBF9"
+          }
+        ],
+        "/integ-lambda-rust-function/binary1/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "binary13A08F2FB"
+          }
+        ],
+        "/integ-lambda-rust-function/FunctionArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FunctionArn"
+          }
+        ],
+        "/integ-lambda-rust-function/Exports/Output{\"Ref\":\"binary13A08F2FB\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefbinary13A08F2FBE7683BB1"
+          }
+        ],
+        "/integ-lambda-rust-function/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/integ-lambda-rust-function/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "integ-lambda-rust-function"
+    },
+    "lambdarustfunctionDefaultTestDeployAssert1211A947.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "lambdarustfunctionDefaultTestDeployAssert1211A947.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "lambdarustfunctionDefaultTestDeployAssert1211A947": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "lambdarustfunctionDefaultTestDeployAssert1211A947.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/b8bd2a54f71520b1d464f86ce4cc612566306127a10dc128f7861015fa75c63f.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "lambdarustfunctionDefaultTestDeployAssert1211A947.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "integ-lambda-rust-function",
+        "lambdarustfunctionDefaultTestDeployAssert1211A947.assets"
+      ],
+      "metadata": {
+        "/lambda-rust-function/DefaultTest/DeployAssert/LambdaInvoke5f64dcf3ca116111b3990b2653985d2f/Default/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaInvoke5f64dcf3ca116111b3990b2653985d2f"
+          }
+        ],
+        "/lambda-rust-function/DefaultTest/DeployAssert/LambdaInvoke5f64dcf3ca116111b3990b2653985d2f/Invoke": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaInvoke5f64dcf3ca116111b3990b2653985d2fInvokeB1FAC0C5"
+          }
+        ],
+        "/lambda-rust-function/DefaultTest/DeployAssert/LambdaInvoke5f64dcf3ca116111b3990b2653985d2f/AssertionResults": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AssertionResultsLambdaInvoke5f64dcf3ca116111b3990b2653985d2f"
+          }
+        ],
+        "/lambda-rust-function/DefaultTest/DeployAssert/SingletonFunction1488541a7b23466481b69b4408076b81/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SingletonFunction1488541a7b23466481b69b4408076b81Role37ABCE73"
+          }
+        ],
+        "/lambda-rust-function/DefaultTest/DeployAssert/SingletonFunction1488541a7b23466481b69b4408076b81/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SingletonFunction1488541a7b23466481b69b4408076b81HandlerCD40AE9F"
+          }
+        ],
+        "/lambda-rust-function/DefaultTest/DeployAssert/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/lambda-rust-function/DefaultTest/DeployAssert/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "lambda-rust-function/DefaultTest/DeployAssert"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

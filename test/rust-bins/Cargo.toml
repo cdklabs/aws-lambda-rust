@@ -1,0 +1,31 @@
+[package]
+name = "rust-bins"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "my_lambda1"
+path = "src/bin/my_lambda1/main.rs"
+
+[[bin]]
+name = "my_lambda2"
+path = "src/bin/my_lambda2/main.rs"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lambda_http = "0.6.1"
+lambda_runtime = "0.6.1"
+tokio = { version = "1", features = ["macros"] }
+tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
+
+[features]
+
+# We could choose to enable any project dependencies marked as `optional = true`
+# here, but in this case it simply serves as a config flag that we use in code.
+#
+# See https://stackoverflow.com/a/27634313/10237506 for more info.
+my-dev-feature = []
+my-prod-feature = []
