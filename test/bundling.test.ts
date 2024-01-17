@@ -170,7 +170,10 @@ describe('Bundling in Docker', () => {
     // Mock path.basename() because it cannot extract the basename of a Windows
     // path when running on Linux
     jest.spyOn(path, 'basename').mockReturnValueOnce('Cargo.toml');
-    jest.spyOn(path, 'relative').mockReturnValueOnce('lib\\Cargo.toml').mockReturnValueOnce('Cargo.toml');
+    jest
+      .spyOn(path, 'relative')
+      .mockReturnValueOnce('lib\\Cargo.toml')
+      .mockReturnValueOnce('Cargo.toml');
 
     Bundling.bundle({
       entry: 'C:\\my-project\\lib\\Cargo.toml',

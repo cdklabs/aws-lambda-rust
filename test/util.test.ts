@@ -1,9 +1,15 @@
 import * as child_process from 'child_process';
 import { join } from 'path';
-import { callsites } from 'aws-cdk-lib/aws-lambda-nodejs/lib/util';
 import { Bundling } from '../lib/bundling';
-import { checkInstalledTarget, exec, getBinaryName, hasMultipleBinaries } from '../lib/util';
-import { canRunLocally, isWorkspace } from '../src/util';
+import {
+  callsites,
+  checkInstalledTarget,
+  exec,
+  getBinaryName,
+  hasMultipleBinaries,
+  canRunLocally,
+  isWorkspace,
+} from '../lib/util';
 
 jest.mock('child_process');
 
@@ -152,9 +158,7 @@ describe('checkInstalledTarget', () => {
         status: 0,
         stderr: Buffer.from('stderr'),
         stdout: Buffer.from(
-          '' +
-            'aarch64-unknown-linux-gnu\n' +
-            'x86_64-unknown-linux-gnu',
+          '' + 'aarch64-unknown-linux-gnu\n' + 'x86_64-unknown-linux-gnu',
         ),
         pid: 123,
         output: ['stdout', 'stderr'],
@@ -216,7 +220,9 @@ describe('getBinaryName', () => {
   });
 
   test('From non existing project', () => {
-    expect(() => getBinaryName('test-unknown-path')).toThrow('Unable to parse Manifest file `test-unknown-path`');
+    expect(() => getBinaryName('test-unknown-path')).toThrow(
+      'Unable to parse Manifest file `test-unknown-path`',
+    );
   });
 });
 
@@ -237,7 +243,9 @@ describe('hasMultipleBinaries', () => {
   });
 
   test('From non existing project', () => {
-    expect(() => getBinaryName('test-unknown-path')).toThrow('Unable to parse Manifest file `test-unknown-path`');
+    expect(() => getBinaryName('test-unknown-path')).toThrow(
+      'Unable to parse Manifest file `test-unknown-path`',
+    );
   });
 });
 
@@ -258,6 +266,8 @@ describe('isWorkspace', () => {
   });
 
   test('From non existing project', () => {
-    expect(() => getBinaryName('test-unknown-path')).toThrow('Unable to parse Manifest file `test-unknown-path`');
+    expect(() => getBinaryName('test-unknown-path')).toThrow(
+      'Unable to parse Manifest file `test-unknown-path`',
+    );
   });
 });

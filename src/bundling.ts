@@ -12,7 +12,13 @@ import {
 } from 'aws-cdk-lib/core';
 import { PackageManager } from './package-manager';
 import { BundlingOptions, LogLevel, PackageManagerType } from './types';
-import { checkInstalledTarget, exec, getBinaryName, hasMultipleBinaries, isWorkspace } from './util';
+import {
+  checkInstalledTarget,
+  exec,
+  getBinaryName,
+  hasMultipleBinaries,
+  isWorkspace,
+} from './util';
 
 /**
  * Bundling properties
@@ -89,9 +95,10 @@ export class Bundling implements CdkBundlingOptions {
     const packageManagerType =
       props.packageManagerType ?? PackageManagerType.CARGO_ZIGBUILD;
     this.packageManager = PackageManager.fromType(packageManagerType);
-    this.target = this.props.target && isValidTarget(this.props.target)
-      ? this.props.target
-      : toTarget(this.props.architecture);
+    this.target =
+      this.props.target && isValidTarget(this.props.target)
+        ? this.props.target
+        : toTarget(this.props.architecture);
 
     const buildArgs = ['--release', '--color', 'always'];
     if (props.extraBuildArgs) {
@@ -142,10 +149,12 @@ export class Bundling implements CdkBundlingOptions {
   public createBundlingCommand(options: BundlingCommandOptions): string {
     const pathJoin = osPathJoin(options.osPlatform);
     const osPlatform = os.platform();
-    let relativeManifestPath = options.inputDir ? pathJoin(
-      options.inputDir,
-      path.relative(path.dirname(this.props.entry), this.props.entry),
-    ) : this.props.entry;
+    let relativeManifestPath = options.inputDir
+      ? pathJoin(
+          options.inputDir,
+          path.relative(path.dirname(this.props.entry), this.props.entry),
+        )
+      : this.props.entry;
     let binaryName;
 
     const buildCommand: string[] = [
@@ -157,14 +166,21 @@ export class Bundling implements CdkBundlingOptions {
 
     if (this.props.binaryName) {
       binaryName = this.props.binaryName;
-    } else if (isWorkspace(this.props.entry) || hasMultipleBinaries(this.props.entry)) {
-      throw new Error('Your Cargo project is a workspace or contains multiple binaries, use the property `binaryName` to specify the binary to use.');
+    } else if (
+      isWorkspace(this.props.entry) ||
+      hasMultipleBinaries(this.props.entry)
+    ) {
+      throw new Error(
+        'Your Cargo project is a workspace or contains multiple binaries, use the property `binaryName` to specify the binary to use.',
+      );
     } else {
       binaryName = getBinaryName(this.props.entry);
     }
 
     if (!binaryName) {
-      throw new Error('Your Cargo project is missing the package name or a [[bin]] section, use the property `binaryName` to specify the binary to use');
+      throw new Error(
+        'Your Cargo project is missing the package name or a [[bin]] section, use the property `binaryName` to specify the binary to use',
+      );
     }
     buildCommand.push('--bin', binaryName);
 
@@ -181,15 +197,28 @@ export class Bundling implements CdkBundlingOptions {
     }
 
     // Move target file to destination
-    const sourceBootstrap = pathJoin(path.dirname(relativeManifestPath), 'target', this.target, 'release', binaryName);
-    const targetBootstrap= pathJoin(options.outputDir, 'bootstrap');
+    const sourceBootstrap = pathJoin(
+      path.dirname(relativeManifestPath),
+      'target',
+      this.target,
+      'release',
+      binaryName,
+    );
+    const targetBootstrap = pathJoin(options.outputDir, 'bootstrap');
     const moveCommand: string =
-        osPlatform === 'win32'
-          ? ['powershell', '-command', 'Move-Item', '-Path', sourceBootstrap, '-Destination', targetBootstrap]
+      osPlatform === 'win32'
+        ? [
+            'powershell',
+            '-command',
+            'Move-Item',
+            '-Path',
+            sourceBootstrap,
+            '-Destination',
+            targetBootstrap,
+          ]
             .filter((c) => !!c)
             .join(' ')
-          : ['mv', sourceBootstrap, targetBootstrap].filter((c) => !!c).join(' ');
-
+        : ['mv', sourceBootstrap, targetBootstrap].filter((c) => !!c).join(' ');
 
     return chain([
       ...(this.props.commandHooks?.beforeBundling(

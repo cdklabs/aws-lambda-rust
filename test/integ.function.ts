@@ -35,8 +35,9 @@ const invoke = integ.assertions.invokeFunction({
 });
 
 invoke.expect(
-  ExpectedResult.objectLike( {
-    Payload: '{"statusCode":200,"headers":{},"multiValueHeaders":{},"body":"OK","isBase64Encoded":false}',
+  ExpectedResult.objectLike({
+    Payload:
+      '{"statusCode":200,"headers":{},"multiValueHeaders":{},"body":"OK","isBase64Encoded":false}',
   }),
 );
 app.synth();

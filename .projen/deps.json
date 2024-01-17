@@ -28,11 +28,19 @@
       "type": "build"
     },
     {
+      "name": "eslint-config-prettier",
+      "type": "build"
+    },
+    {
       "name": "eslint-import-resolver-typescript",
       "type": "build"
     },
     {
       "name": "eslint-plugin-import",
+      "type": "build"
+    },
+    {
+      "name": "eslint-plugin-prettier",
       "type": "build"
     },
     {
@@ -71,6 +79,10 @@
       "type": "build"
     },
     {
+      "name": "prettier",
+      "type": "build"
+    },
+    {
       "name": "projen",
       "type": "build"
     },
@@ -89,7 +101,6 @@
     },
     {
       "name": "typescript",
-      "version": "~5.3.3",
       "type": "build"
     },
     {
@@ -108,7 +119,7 @@
     },
     {
       "name": "aws-cdk-lib",
-      "version": "^2.114.0",
+      "version": "^2.121.0",
       "type": "peer"
     },
     {
@@ -118,7 +129,7 @@
     },
     {
       "name": "@aws-cdk/integ-tests-alpha",
-      "version": "2.114.0-alpha.0",
+      "version": "2.121.0-alpha.0",
       "type": "test"
     }
   ],

@@ -85,7 +85,6 @@ test('RustFunction with specific binary', () => {
 });
 
 test('Find manifest when entry is a directory', () => {
-
   new RustFunction(stack, 'Fn', {
     entry: path.join(__dirname, 'rust-standalone'),
   });
@@ -95,7 +94,6 @@ test('Find manifest when entry is a directory', () => {
       entry: expect.stringContaining('Cargo.toml'),
     }),
   );
-
 });
 
 test('throws when entry does not exist', () => {
