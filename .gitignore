@@ -35,11 +35,7 @@ jspm_packages/
 *.generated.ts
 *.js
 **/integ.*.snapshot/asset.*/
-**/bin
-**/obj
-/*.sln
 **/target
-!/.projenrc.js
 /test-reports/
 junit.xml
 /coverage/
@@ -48,6 +44,8 @@ junit.xml
 /dist/version.txt
 !/.github/workflows/release.yml
 !/.github/pull_request_template.md
+!/.prettierignore
+!/.prettierrc.json
 !/test/
 !/tsconfig.dev.json
 !/src/
@@ -63,3 +61,4 @@ tsconfig.json
 !/.github/workflows/upgrade-cdklabs-projen-project-types-main.yml
 !/.github/workflows/upgrade-main.yml
 !/.github/workflows/upgrade-dev-deps-main.yml
+!/.projenrc.ts

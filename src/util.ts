@@ -47,12 +47,10 @@ export function getBinaryName(entry: string) {
     return data.package?.name;
   } catch (err) {
     throw new Error(
-      `Unable to parse Manifest file \`${entry}\`\n` +
-        `${err}\n`,
+      `Unable to parse Manifest file \`${entry}\`\n` + `${err}\n`,
     );
   }
 }
-
 
 export function hasMultipleBinaries(entry: string) {
   try {
@@ -61,8 +59,7 @@ export function hasMultipleBinaries(entry: string) {
     return data.bin && data.bin.length > 1;
   } catch (err) {
     throw new Error(
-      `Unable to parse Manifest file \`${entry}\`\n` +
-        `${err}\n`,
+      `Unable to parse Manifest file \`${entry}\`\n` + `${err}\n`,
     );
   }
 }
@@ -75,11 +72,14 @@ export function isWorkspace(entry: string) {
   try {
     const contents = readFileSync(entry, 'utf8');
     let data: TomlProps = toml.parse(contents);
-    return data.workspace && data.workspace.members && data.workspace.members.length > 0;
+    return (
+      data.workspace &&
+      data.workspace.members &&
+      data.workspace.members.length > 0
+    );
   } catch (err) {
     throw new Error(
-      `Unable to parse Manifest file \`${entry}\`\n` +
-        `${err}\n`,
+      `Unable to parse Manifest file \`${entry}\`\n` + `${err}\n`,
     );
   }
 }

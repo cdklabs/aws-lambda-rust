@@ -93,7 +93,6 @@ export class RustFunction extends Function {
  */
 function findEntry(id: string, entry?: string): string {
   if (entry) {
-
     if (!/\Cargo.toml$/.test(entry)) {
       // Only Cargo.toml files are supported.
       // If the user gave a path to a directory, we'll look for a Cargo.toml file in it.

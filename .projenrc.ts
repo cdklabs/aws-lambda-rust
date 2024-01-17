@@ -1,12 +1,15 @@
-import { CdklabsConstructLibrary, JsiiLanguage } from 'cdklabs-projen-project-types';
+import {
+  CdklabsConstructLibrary,
+  JsiiLanguage,
+} from 'cdklabs-projen-project-types';
 import { DependencyType } from 'projen';
+import { UpgradeDependenciesSchedule } from 'projen/lib/javascript';
 
 const project = new CdklabsConstructLibrary({
   author: 'AWS',
   authorAddress: 'aws-cdk-dev@amazon.com',
-  cdkVersion: '2.114.0',
+  cdkVersion: '2.121.0',
   jsiiVersion: '~5.3.0',
-  typescriptVersion: '~5.3.3',
   defaultReleaseBranch: 'main',
   devDeps: ['cdklabs-projen-project-types', '@aws-cdk/integ-tests-alpha'],
   bundledDeps: ['toml'],
@@ -17,6 +20,17 @@ const project = new CdklabsConstructLibrary({
   stability: 'experimental',
   setNodeEngineVersion: false,
   repositoryUrl: 'https://github.com/cdklabs/aws-lambda-rust.git',
+  depsUpgradeOptions: {
+    workflowOptions: {
+      schedule: UpgradeDependenciesSchedule.WEEKLY,
+    },
+  },
+  prettier: true,
+  prettierOptions: {
+    settings: {
+      singleQuote: true,
+    },
+  },
   jsiiTargetLanguages: [
     JsiiLanguage.JAVA,
     JsiiLanguage.PYTHON,
@@ -46,14 +60,11 @@ const project = new CdklabsConstructLibrary({
     '*.generated.ts',
     '*.js',
     '**/integ.*.snapshot/asset.*/',
-    '**/bin',
-    '**/obj',
-    '/*.sln',
     '**/target',
   ],
 });
 project.deps.addDependency(
-  '@aws-cdk/integ-tests-alpha@2.114.0-alpha.0',
+  '@aws-cdk/integ-tests-alpha@2.121.0-alpha.0',
   DependencyType.TEST,
 );
 
