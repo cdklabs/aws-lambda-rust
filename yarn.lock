@@ -878,9 +878,9 @@
   integrity sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==
 
 "@types/node@*":
-  version "20.11.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.7.tgz#cb49aedd758c978c30806d0c38b520ed2a3df6e0"
-  integrity sha512-GPmeN1C3XAyV5uybAf4cMLWT9fDWcmQhZVtMFu7OR32WjrqGG+Wnk2V1d0bmtUyE/Zy1QJ9BxyiTih9z8Oks8A==
+  version "20.11.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.8.tgz#bdb6de1048613c3c6ab6c341c37e8fd1a7860308"
+  integrity sha512-i7omyekpPTNdv4Jb/Rgqg0RU8YqLcNsI12quKSDkRXNfx7Wxdm6HhK1awT3xTgEkgxPn3bvnSpiEAc7a7Lpyow==
   dependencies:
     undici-types "~5.26.4"
 
@@ -3379,10 +3379,10 @@ jsii-diff@^1.94.0:
     log4js "^6.9.1"
     yargs "^16.2.0"
 
-jsii-docgen@^10.3.11:
-  version "10.3.11"
-  resolved "https://registry.yarnpkg.com/jsii-docgen/-/jsii-docgen-10.3.11.tgz#b50ec7dc1cdd3f61bded232775d177511d49d258"
-  integrity sha512-iwhdhD6zjF39cjTCS8gaBkW3lBRyADzkinzCfqVsjT9o6Ck32+uGunZ5foB6L1NBwLTX4fMvsJyHRqDXXRpfiQ==
+jsii-docgen@^10.3.12:
+  version "10.3.12"
+  resolved "https://registry.yarnpkg.com/jsii-docgen/-/jsii-docgen-10.3.12.tgz#17af92f518e53d5e86f14412f398cf04cd6c001a"
+  integrity sha512-vQ0bvbyrsCzpdJa4O4Wd5Zd+yOSiuvvKdlv0ZV01bUnUb3zStW5f6Lk32lU/kdNILhwN/EdjzLj2YK0aSaNFJw==
   dependencies:
     "@jsii/spec" "^1.94.0"
     case "^1.6.3"
