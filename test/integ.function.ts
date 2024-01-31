@@ -14,6 +14,9 @@ class TestStack extends Stack {
 
     const fn = new RustFunction(this, 'binary1', {
       entry: 'rust-standalone/Cargo.toml',
+      bundling: {
+        forceDockerBundling: true,
+      },
     });
     this.functionName = fn.functionName;
 
