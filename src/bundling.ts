@@ -111,7 +111,7 @@ export class Bundling implements CdkBundlingOptions {
       !checkInstalledTarget(toTarget(this.props.architecture));
     this.image = shouldBuildImage
       ? props.dockerImage ??
-        DockerImage.fromBuild(path.join(__dirname, '../src'), {
+        DockerImage.fromBuild(path.join(__dirname, '../'), {
           buildArgs: {
             ...(props.buildArgs ?? {}),
             // If runtime isn't passed use regional default, lowest common denominator is node18
