@@ -80,7 +80,7 @@ describe('Bundling in Docker', () => {
     );
 
     expect(DockerImage.fromBuild).toHaveBeenCalledWith(
-      expect.stringMatching(/aws-lambda-rust\/src$/),
+      expect.stringMatching(/aws-lambda-rust\/lib$/),
       expect.objectContaining({
         buildArgs: expect.objectContaining({
           IMAGE: expect.stringMatching(/build-provided.al2023$/),
@@ -274,7 +274,7 @@ describe('Bundling in Docker', () => {
     });
 
     expect(DockerImage.fromBuild).toHaveBeenCalledWith(
-      expect.stringMatching(/src$/),
+      expect.stringMatching(/lib$/),
       expect.objectContaining({
         buildArgs: expect.objectContaining({
           HELLO: 'WORLD',
