@@ -6,7 +6,7 @@ const docker = process.env.CDK_DOCKER ?? 'docker';
 beforeAll(() => {
   const process = spawnSync(
     docker,
-    ['build', '-t', 'cargo-builder', path.join(__dirname, '../src')],
+    ['build', '-t', 'cargo-builder', path.join(__dirname, '../')],
     { stdio: 'inherit' },
   );
   expect(process.error).toBeUndefined();
