@@ -63,7 +63,7 @@
     "jsii-docgen": "^10.4.11",
     "jsii-pacmak": "^1.98.0",
     "jsii-rosetta": "^5.4.20",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.0",
     "projen": "^0.82.2",
     "standard-version": "^9",
     "ts-jest": "^29",
