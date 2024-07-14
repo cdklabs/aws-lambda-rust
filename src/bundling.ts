@@ -110,7 +110,7 @@ export class Bundling implements CdkBundlingOptions {
       !this.packageManager.runLocally ||
       !checkInstalledTarget(toTarget(this.props.architecture));
     this.image = shouldBuildImage
-      ? props.dockerImage ??
+      ? (props.dockerImage ??
         DockerImage.fromBuild(path.join(__dirname, '../'), {
           buildArgs: {
             ...(props.buildArgs ?? {}),
@@ -118,7 +118,7 @@ export class Bundling implements CdkBundlingOptions {
             IMAGE: props.runtime.bundlingImage.image,
           },
           platform: props.architecture.dockerPlatform,
-        })
+        }))
       : DockerImage.fromRegistry('dummy'); // Do not build if we don't need to
 
     const bundlingCommand = this.createBundlingCommand({
