@@ -64,7 +64,7 @@
     "jsii-pacmak": "^1.102.0",
     "jsii-rosetta": "^5.4.31",
     "prettier": "^3.3.3",
-    "projen": "^0.85.0",
+    "projen": "^0.85.2",
     "standard-version": "^9",
     "ts-jest": "^29",
     "ts-node": "^10.9.2",
