@@ -801,9 +801,9 @@
   integrity sha512-T8TbSnGsxo6TDBJx/Sgv/BlVJL3tshxZP7Aq5R1mSnM5OcHY2dQaxLMu2+E8u3gN0MLOzdjurqN4ZRVuzQycOQ==
 
 "@pkgr/core@^0.1.0":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.1.1.tgz#1ec17e2edbec25c8306d424ecfbf13c7de1aaa31"
-  integrity sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.1.2.tgz#1cf95080bb7072fafaa3cb13b442fab4695c3893"
+  integrity sha512-fdDH1LSGfZdTH2sxdpVMw31BanV28K/Gry0cVFxaNP77neJSkd82mM8ErPNYs9e+0O7SdHBLTDzDgwUuy18RnQ==
 
 "@rtsao/scc@^1.1.0":
   version "1.1.0"
@@ -2134,9 +2134,9 @@ ejs@^3.1.10:
     jake "^10.8.5"
 
 electron-to-chromium@^1.5.73:
-  version "1.5.120"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.120.tgz#ccfdd28e9795fb8c2221cefa2c9a071501c86247"
-  integrity sha512-oTUp3gfX1gZI+xfD2djr2rzQdHCwHzPQrrK0CD7WpTdF0nPdQ/INcRVjWgLdCT4a9W3jFObR9DAfsuyFQnI8CQ==
+  version "1.5.123"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.123.tgz#fae5bdba0ba27045895176327aa79831aba0790c"
+  integrity sha512-refir3NlutEZqlKaBLK0tzlVLe5P2wDKS7UQt/3SpibizgsRAPOsqQC3ffw1nlv3ze5gjRQZYHoPymgVZkplFA==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -5538,9 +5538,9 @@ typedarray@^0.0.6:
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
 typescript@next:
-  version "5.9.0-dev.20250319"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.0-dev.20250319.tgz#3ae44dd6f8c40134b067a6a9c7a723ffbbbb6e3e"
-  integrity sha512-C6kzsa+mmHXyelLcfTYaINXz01XaznLJKoZKKfcwYa4rDEMVwp2cYd5HcDBd44pJkXbbQprSfPvmgjFDoBTnbw==
+  version "5.9.0-dev.20250320"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.0-dev.20250320.tgz#57a05bdcb0d29ac8ffe70c387292439b4d9afc54"
+  integrity sha512-QD4yAjr3Fb1+ymsKXzsicjYc+ttKEZc/HgXpcGJWTNrH99S4U344WxW0qCusZG1cfjzgMK9CWdYSfjaGy/DOXQ==
 
 typescript@~5.3:
   version "5.3.3"
