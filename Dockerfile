@@ -6,7 +6,7 @@ FROM $IMAGE
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=1.83.0
+    RUST_VERSION=1.85.1
 
 # Install Rust
 RUN set -eux; \
