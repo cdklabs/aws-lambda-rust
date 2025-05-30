@@ -40,7 +40,7 @@ const project = new CdklabsConstructLibrary({
     javaPackage: 'io.github.cdklabs.awslambdarust',
     mavenGroupId: 'io.github.cdklabs',
     mavenArtifactId: 'aws-lambda-rust',
-    mavenEndpoint: 'https://s01.oss.sonatype.org',
+    mavenServerId: 'central-ossrh',
   },
   publishToPypi: {
     distName: 'cdklabs.aws-lambda-rust',
