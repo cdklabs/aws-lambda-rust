@@ -205,3 +205,4 @@ They all receive the directory containing the lock file (inputDir) and the direc
 They must return an array of commands to run. Commands are chained with &&.
 
 The commands will run in the environment in which bundling occurs: inside the container for Docker bundling or on the host OS for local bundling.
+<!-- Updated: Fri May 30 12:29:54 CEST 2025 -->
