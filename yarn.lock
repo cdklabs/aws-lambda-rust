@@ -793,9 +793,9 @@
   integrity sha512-T8TbSnGsxo6TDBJx/Sgv/BlVJL3tshxZP7Aq5R1mSnM5OcHY2dQaxLMu2+E8u3gN0MLOzdjurqN4ZRVuzQycOQ==
 
 "@pkgr/core@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.4.tgz#d897170a2b0ba51f78a099edccd968f7b103387c"
-  integrity sha512-ROFF39F6ZrnzSUEmQQZUar0Jt4xVoP9WnDRdWwF4NNcXs3xBTLgBUDoOwW141y1jP+S8nahIbdxbFC7IShw9Iw==
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.7.tgz#eb5014dfd0b03e7f3ba2eeeff506eed89b028058"
+  integrity sha512-YLT9Zo3oNPJoBjBc4q8G2mjU4tqIbf5CEOORbUUr48dCD9q3umJ3IPlVqOqDakPfd2HuwccBaqlGhN4Gmr5OWg==
 
 "@rtsao/scc@^1.1.0":
   version "1.1.0"
@@ -3887,10 +3887,10 @@ jsii-reflect@^1.112.0:
     oo-ascii-tree "^1.112.0"
     yargs "^16.2.0"
 
-jsii-rosetta@^5.8.8:
-  version "5.8.8"
-  resolved "https://registry.yarnpkg.com/jsii-rosetta/-/jsii-rosetta-5.8.8.tgz#129d8499187b9039aba05a8df479641db067579f"
-  integrity sha512-zhLu75CwQFAYDiOffMXKLmEiw8QAmgMjDHStgd9z5k91Wt4EGrSI5AG2UNV3N9QLkOWdQCCuYjdyaH4BPRvwEg==
+jsii-rosetta@^5.8.9:
+  version "5.8.9"
+  resolved "https://registry.yarnpkg.com/jsii-rosetta/-/jsii-rosetta-5.8.9.tgz#6ca9437efd34a383791dc3cd9c089e6e63eeea34"
+  integrity sha512-bVVi4638FUeRHzHYu13yZGqgaaWeegHIPs2Sx+F8bvicWWtC8BQlQvKIsnErnd4+yRKxC+J0g+7EQrHA+8qT8w==
   dependencies:
     "@jsii/check-node" "1.112.0"
     "@jsii/spec" "^1.112.0"
@@ -5569,9 +5569,9 @@ typedarray@^0.0.6:
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
 typescript@next:
-  version "5.9.0-dev.20250531"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.0-dev.20250531.tgz#8cb9ef384fad63b30207337f94b2aaffa6b1f829"
-  integrity sha512-my0nFL3dnyyAIina0fAVRdd0vHwtJURBNLlGpXvQY558cXlK2+MhiUtK912D01WVxstQPyf+FqMTM2UX6JzIrw==
+  version "5.9.0-dev.20250601"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.0-dev.20250601.tgz#f2c3505e08363890f9a9a5f7217568b92bd394ef"
+  integrity sha512-SY5EzBm1LhXSXXcHNp6QTAQqJ3+cE1ocZHiaejNCjNuQ4OjwyQrG+1eD/KHjfvpf9xXbWyTDQqYeUReWownp9Q==
 
 typescript@~5.3:
   version "5.3.3"
