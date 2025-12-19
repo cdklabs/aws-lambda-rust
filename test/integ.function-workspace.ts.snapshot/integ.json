@@ -1,13 +1,14 @@
 {
-  "version": "35.0.0",
+  "version": "48.0.0",
   "testCases": {
     "lambda-rust-function/DefaultTest": {
       "stacks": [
         "integ-lambda-rust-function-workspace"
       ],
-      "stackUpdateWorkflow": true,
+      "stackUpdateWorkflow": false,
       "assertionStack": "lambda-rust-function/DefaultTest/DeployAssert",
       "assertionStackName": "lambdarustfunctionDefaultTestDeployAssert1211A947"
     }
-  }
+  },
+  "minimumCliVersion": "2.1033.0"
 }

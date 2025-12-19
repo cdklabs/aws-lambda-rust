@@ -81,7 +81,7 @@
     },
     {
       "name": "jsii",
-      "version": "~5.3.0",
+      "version": "~5.9.0",
       "type": "build"
     },
     {
@@ -120,7 +120,7 @@
     },
     {
       "name": "aws-cdk-lib",
-      "version": "^2.121.0",
+      "version": "^2.233.0",
       "type": "peer"
     },
     {
@@ -130,7 +130,7 @@
     },
     {
       "name": "@aws-cdk/integ-tests-alpha",
-      "version": "2.121.0-alpha.0",
+      "version": "2.233.0-alpha.0",
       "type": "test"
     }
   ],

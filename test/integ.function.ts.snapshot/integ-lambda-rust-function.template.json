@@ -38,7 +38,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "2c9536aa54ef4116ba5579355660ffe8e11a8a7bb876ca0db342eaf98c86ce37.zip"
+     "S3Key": "53684589a5edc85f049775346169e5ec0b82d8eab30d114d0bc2c397e2054a9c.zip"
     },
     "Handler": "rust.handler",
     "Role": {
@@ -52,6 +52,25 @@
    "DependsOn": [
     "binary1ServiceRole6833FBF9"
    ]
+  },
+  "binary1LogGroupD6F54FE0": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "binary13A08F2FB"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 731
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain"
   }
  },
  "Outputs": {

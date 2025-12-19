@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { ExpectedResult, IntegTest } from '@aws-cdk/integ-tests-alpha';
 import { App, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -13,7 +14,7 @@ class TestStack extends Stack {
     super(scope, id, props);
 
     const fn = new RustFunction(this, 'binary1', {
-      entry: 'rust-workspaces/Cargo.toml',
+      entry: path.join(__dirname, 'rust-workspaces/Cargo.toml'),
       binaryName: 'my_lambda2',
       bundling: {
         forceDockerBundling: true,

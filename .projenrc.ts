@@ -8,8 +8,8 @@ import { UpgradeDependenciesSchedule } from 'projen/lib/javascript';
 const project = new CdklabsConstructLibrary({
   author: 'AWS',
   authorAddress: 'aws-cdk-dev@amazon.com',
-  cdkVersion: '2.121.0',
-  jsiiVersion: '~5.3.0',
+  cdkVersion: '2.233.0',
+  jsiiVersion: '~5.9.0',
   defaultReleaseBranch: 'main',
   devDeps: ['cdklabs-projen-project-types', '@aws-cdk/integ-tests-alpha'],
   bundledDeps: ['toml'],
@@ -64,7 +64,7 @@ const project = new CdklabsConstructLibrary({
   ],
 });
 project.deps.addDependency(
-  '@aws-cdk/integ-tests-alpha@2.121.0-alpha.0',
+  '@aws-cdk/integ-tests-alpha@2.233.0-alpha.0',
   DependencyType.TEST,
 );
 

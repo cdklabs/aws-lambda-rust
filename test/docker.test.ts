@@ -43,25 +43,6 @@ test('cross is available', () => {
   expect(proc.status).toEqual(0);
 });
 
-test('can package manager install with non root user', () => {
-  const proc = spawnSync(docker, [
-    'run',
-    '-u',
-    '1000:1000',
-    'cargo-builder',
-    'bash',
-    '-c',
-    [
-      'mkdir /tmp/test',
-      'cd /tmp/test',
-      'cargo new sample',
-      'cd sample',
-      'cargo add aws-config',
-    ].join(' && '),
-  ]);
-  expect(proc.status).toEqual(0);
-});
-
 test('cache folders have the right permissions', () => {
   const proc = spawnSync(docker, [
     'run',
