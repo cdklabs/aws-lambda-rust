@@ -53,7 +53,9 @@ export class PackageManager {
 
   public runBuildCommand(): string {
     return [
-      os.platform() === 'win32' ? `${this.runCommand}.cmd` : this.runCommand,
+      os.platform() === 'win32' && this.runLocally
+        ? `${this.runCommand}.cmd`
+        : this.runCommand,
       ...this.buildCommand,
     ].join(' ');
   }
