@@ -4,6 +4,8 @@
 
 ### RustFunction <a name="RustFunction" id="@cdklabs/aws-lambda-rust.RustFunction"></a>
 
+- *Implements:* constructs.IConstruct, constructs.IDependable, aws-cdk-lib.IResource, aws-cdk-lib.interfaces.IEnvironmentAware, aws-cdk-lib.aws_lambda.IFunction, aws-cdk-lib.aws_ec2.IConnectable, aws-cdk-lib.aws_iam.IGrantable, aws-cdk-lib.interfaces.aws_lambda.IFunctionRef, aws-cdk-lib.aws_ec2.IClientVpnConnectionHandler
+
 A Rust Lambda function.
 
 #### Initializers <a name="Initializers" id="@cdklabs/aws-lambda-rust.RustFunction.Initializer"></a>
